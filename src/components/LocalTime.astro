@@ -1,0 +1,24 @@
+---
+export interface Props {
+  hour: string;
+  date: string;
+  id: string;
+}
+
+const { hour, date, id } = Astro.props;
+---
+
+<span class="local-time-widget">
+  <span class="text-on-surface/60">Tu hora:</span>
+  <span id={`local-time-${id}`} class="font-semibold text-on-surface">--:--</span>
+</span>
+
+<script is:inline define:vars={{ hour, date, id }}>
+  try {
+    const [h, m] = hour.split(':');
+    const argDate = new Date(`${date}T${h.padStart(2, '0')}:${m.padStart(2, '0')}:00-03:00`);
+    const localTime = argDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const el = document.getElementById(`local-time-${id}`);
+    if (el) el.textContent = localTime;
+  } catch {}
+</script>

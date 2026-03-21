@@ -1,0 +1,109 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  matchSchema?: object;
+}
+
+const { title, description, canonicalUrl, matchSchema } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalUrl} />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta name="theme-color" content="#D32F2F" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  {matchSchema && (
+    <script type="application/ld+json" set:html={JSON.stringify(matchSchema)} />
+  )}
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-surface/95 backdrop-blur-md border-b border-white/5">
+    <nav class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="text-xl font-black tracking-tight text-primary hover:text-red-400 transition-colors">
+        rojadirectaenvivo
+      </a>
+
+      <!-- Desktop nav -->
+      <ul class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <li><a href="/" class="hover:text-primary transition-colors">Inicio</a></li>
+        <li><a href="/rojadirecta-en-vivo/" class="hover:text-primary transition-colors">Rojadirecta en Vivo</a></li>
+        <li><a href="/tarjeta-roja/" class="hover:text-primary transition-colors">Tarjeta Roja</a></li>
+        <li><a href="/pirlo-tv/" class="hover:text-primary transition-colors">Pirlo TV</a></li>
+      </ul>
+
+      <!-- Mobile menu toggle -->
+      <button id="mobile-menu-btn" class="md:hidden text-on-surface p-2" aria-label="Menú">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Mobile nav -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-surface-variant">
+      <ul class="flex flex-col px-4 py-3 gap-3 text-sm font-medium">
+        <li><a href="/" class="block py-1 hover:text-primary">Inicio</a></li>
+        <li><a href="/rojadirecta-en-vivo/" class="block py-1 hover:text-primary">Rojadirecta en Vivo</a></li>
+        <li><a href="/tarjeta-roja/" class="block py-1 hover:text-primary">Tarjeta Roja</a></li>
+        <li><a href="/pirlo-tv/" class="block py-1 hover:text-primary">Pirlo TV</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+    <slot />
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <section class="seo-text">
+        <h2>Rojadirecta en Vivo – Ver Fútbol Gratis</h2>
+        <p>
+          Bienvenido a <strong>Rojadirecta en Vivo</strong>, tu destino para ver fútbol en vivo gratis hoy.
+          Aquí encontrarás todos los partidos del día transmitidos en directo, igual que en
+          <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
+          Disfruta de la <strong>roja directa</strong> sin cortes y en alta definición.
+        </p>
+        <p>
+          Seguimos todos los campeonatos en vivo: LaLiga, Premier League, Serie A, Bundesliga,
+          Liga MX, Liga Profesional Argentina, Copa Libertadores y mucho más.
+          Ver <strong>futbol en vivo</strong> nunca fue tan fácil — sin registro, sin pago, gratis.
+        </p>
+      </section>
+
+      <div class="mt-6 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-on-surface/40">
+        <p>&copy; {new Date().getFullYear()} rojadirectaenvivo.top — Todos los derechos reservados.</p>
+        <ul class="flex items-center gap-4">
+          <li><a href="/" class="hover:text-primary">Inicio</a></li>
+          <li><a href="/rojadirecta-en-vivo/" class="hover:text-primary">Rojadirecta</a></li>
+          <li><a href="/tarjeta-roja/" class="hover:text-primary">Tarjeta Roja</a></li>
+          <li><a href="/pirlo-tv/" class="hover:text-primary">Pirlo TV</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile menu script -->
+  <script is:inline>
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+      document.getElementById('mobile-menu')?.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import MatchCard from '../components/MatchCard.astro';
+
+import matchDataRaw from '../data/matches.json';
+const matchData = matchDataRaw;
+
+const matches = matchData.data || [];
+
+function parseMatch(event) {
+  const desc = (event.attributes?.diary_description || '').trim().replace(/\s+/g, ' ');
+  const colonIdx = desc.indexOf(':');
+  const league = colonIdx > -1 ? desc.slice(0, colonIdx).trim() : '';
+  const teams = colonIdx > -1 ? desc.slice(colonIdx + 1).trim() : desc;
+  return { league, teams };
+}
+
+function toSlug(event) {
+  const desc = (event.attributes?.diary_description || '')
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+function getCountry(event) {
+  const countryData = event.attributes?.country?.data?.attributes;
+  return {
+    name: countryData?.name || 'Internacional',
+    flagUrl: countryData?.image?.data?.attributes?.url || '',
+  };
+}
+
+function getChannels(event) {
+  const embeds = event.attributes?.embeds?.data || [];
+  return embeds.map(e => e.attributes?.embed_name || 'Canal').filter(Boolean);
+}
+
+const title = 'Rojadirecta en Vivo – Ver Fútbol Online Gratis | Tarjeta Roja TV';
+const description = 'Rojadirecta en vivo te permite ver fútbol en vivo gratis hoy. Todos los partidos del día en directo. Mejor que Tarjeta Roja y Pirlo TV.';
+const canonicalUrl = 'https://rojadirectaenvivo.top/rojadirecta-en-vivo/';
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <h1 class="text-3xl md:text-4xl font-black mb-6 text-on-surface">
+    Rojadirecta en Vivo – Fútbol en Vivo Gratis
+  </h1>
+
+  <div class="prose prose-invert max-w-none mb-10">
+    <p class="text-on-surface/70 leading-relaxed">
+      <strong>Rojadirecta en Vivo</strong> es tu portal definitivo para ver <strong>fútbol en vivo gratis</strong> desde cualquier lugar del mundo.
+      Nuestra plataforma te ofrece acceso directo a todos los partidos del día, con múltiples canales de transmisión para que nunca te pierdas un gol.
+      Somos la alternativa perfecta a <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
+    </p>
+
+    <p class="text-on-surface/70 leading-relaxed">
+      En <strong>rojadirectaenvivo.top</strong> encontrarás transmisiones en vivo de las mejores ligas del mundo:
+      LaLiga Española, Premier League, Serie A, Bundesliga, Liga MX, Liga Profesional Argentina,
+      Copa Libertadores, Champions League y muchas más. Todo gratis y sin necesidad de registro.
+    </p>
+
+    <p class="text-on-surface/70 leading-relaxed">
+      La <strong>roja directa</strong> nunca fue tan fácil de acceder. Con solo un clic puedes ver tu partido favorito
+      en vivo y en directo. Nuestros streams se actualizan cada 3 horas para garantizar que siempre tengas
+      la información más reciente. Ya sea que busques <strong>rojadirecta</strong>, <strong>tarjeta roja en vivo</strong>
+      o <strong>pirlo tv rojadirecta</strong>, aquí encontrarás todo lo que necesitas.
+    </p>
+
+    <p class="text-on-surface/70 leading-relaxed">
+      No importa si estás en España, Argentina, México, Colombia o cualquier otro país hispanohablante —
+      <strong>Rojadirecta en Vivo</strong> funciona en todo el mundo. Ver <strong>futbol en vivo</strong>
+      gratis es posible gracias a nuestra red de canales y transmisiones. Disfruta del mejor
+      <strong>fútbol en vivo gratis hoy</strong> sin complicaciones.
+    </p>
+  </div>
+
+  <h2 class="text-xl font-bold text-on-surface/80 mb-4">Partidos de Hoy</h2>
+
+  {matches.length > 0 ? (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {matches.map((event) => {
+        const { league, teams } = parseMatch(event);
+        const country = getCountry(event);
+        const channels = getChannels(event);
+        const slug = toSlug(event);
+        return (
+          <MatchCard
+            id={event.id}
+            slug={slug}
+            title={event.attributes?.diary_description || ''}
+            league={league}
+            teams={teams}
+            hour={event.attributes?.diary_hour || ''}
+            date={event.attributes?.date_diary || ''}
+            country={country.name}
+            flagUrl={country.flagUrl}
+            channels={channels}
+          />
+        );
+      })}
+    </div>
+  ) : (
+    <p class="text-on-surface/50">No hay partidos disponibles en este momento.</p>
+  )}
+</Base>

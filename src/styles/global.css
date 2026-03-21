@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --md-sys-color-primary: #D32F2F;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-surface: #121212;
+  --md-sys-color-on-surface: #E0E0E0;
+  --md-sys-color-surface-variant: #1E1E1E;
+  --md-sys-color-secondary: #FF6F00;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-on-surface font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    @apply text-on-surface hover:text-primary transition-colors duration-200;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-bold;
+  }
+}
+
+@layer components {
+  .match-card {
+    @apply bg-surface-variant rounded-2xl border border-white/5 p-5 hover:border-primary/30 transition-all duration-300 cursor-pointer;
+  }
+
+  .match-card:hover {
+    box-shadow: 0 4px 24px rgba(211, 47, 47, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .channel-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-on-surface/70;
+  }
+
+  .channel-tab {
+    @apply px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-on-surface/70 border border-white/5 cursor-pointer transition-all duration-200;
+  }
+
+  .channel-tab:hover {
+    @apply bg-white/10 text-on-surface;
+  }
+
+  .channel-tab.active {
+    @apply bg-primary text-on-primary border-primary;
+  }
+
+  .live-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-primary/20 text-primary;
+  }
+
+  .live-badge::before {
+    content: '';
+    @apply w-2 h-2 rounded-full bg-primary;
+    animation: pulse-live 1.5s ease-in-out infinite;
+  }
+
+  .cta-button {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-red-700 transition-all duration-200;
+  }
+
+  .seo-text {
+    @apply mt-12 py-8 border-t border-white/5 text-on-surface/60 text-sm leading-relaxed;
+  }
+
+  .seo-text h2 {
+    @apply text-on-surface/80 text-lg font-semibold mb-4;
+  }
+
+  .seo-text p {
+    @apply mb-3;
+  }
+
+  .seo-text strong {
+    @apply text-on-surface/80;
+  }
+
+  .breadcrumb {
+    @apply flex items-center gap-2 text-sm text-on-surface/50 mb-6;
+  }
+
+  .breadcrumb a {
+    @apply text-on-surface/50 hover:text-primary;
+  }
+
+  .breadcrumb span {
+    @apply text-on-surface/30;
+  }
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Player iframe container */
+.player-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.player-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}

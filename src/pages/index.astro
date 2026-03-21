@@ -1,0 +1,145 @@
+---
+import Base from '../layouts/Base.astro';
+import MatchCard from '../components/MatchCard.astro';
+
+// Import match data
+import matchDataRaw from '../data/matches.json';
+const matchData = matchDataRaw;
+
+
+const matches = matchData.data || [];
+
+// Helper: parse diary_description
+function parseMatch(event) {
+  const desc = (event.attributes?.diary_description || '').trim().replace(/\s+/g, ' ');
+  const colonIdx = desc.indexOf(':');
+  const league = colonIdx > -1 ? desc.slice(0, colonIdx).trim() : '';
+  const teams = colonIdx > -1 ? desc.slice(colonIdx + 1).trim() : desc;
+  return { league, teams };
+}
+
+// Helper: generate slug
+function toSlug(event) {
+  const desc = (event.attributes?.diary_description || '')
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+// Helper: get country info
+function getCountry(event) {
+  const countryData = event.attributes?.country?.data?.attributes;
+  return {
+    name: countryData?.name || 'Internacional',
+    flagUrl: countryData?.image?.data?.attributes?.url || '',
+  };
+}
+
+// Helper: get channel names
+function getChannels(event) {
+  const embeds = event.attributes?.embeds?.data || [];
+  return embeds.map(e => e.attributes?.embed_name || 'Canal').filter(Boolean);
+}
+
+// Group matches by country
+const grouped = {};
+for (const event of matches) {
+  const country = getCountry(event);
+  const key = country.name;
+  if (!grouped[key]) grouped[key] = { country, matches: [] };
+  grouped[key].matches.push(event);
+}
+
+// Sort matches within each group by hour
+for (const key in grouped) {
+  grouped[key].matches.sort((a, b) =>
+    (a.attributes?.diary_hour || '').localeCompare(b.attributes?.diary_hour || '')
+  );
+}
+
+// Get today's date for display
+const today = new Date();
+const dateStr = today.toLocaleDateString('es-ES', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const title = 'Rojadirecta en Vivo 🔴 Fútbol en Vivo Gratis | Tarjeta Roja TV Pirlo TV';
+const description = 'Ver fútbol en vivo gratis hoy. Rojadirecta en vivo, Tarjeta Roja, Pirlo TV - todos los partidos del día en rojadirectaenvivo.top';
+const canonicalUrl = 'https://rojadirectaenvivo.top/';
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Rojadirecta en Vivo",
+  "url": "https://rojadirectaenvivo.top",
+  "description": "Ver fútbol en vivo gratis - Rojadirecta, Tarjeta Roja, Pirlo TV",
+  "inLanguage": "es",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://rojadirectaenvivo.top/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+};
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={websiteSchema}>
+  <h1 class="text-3xl md:text-4xl font-black mb-2 text-on-surface">
+    Rojadirecta en Vivo – Fútbol en Vivo Gratis Hoy
+  </h1>
+
+  <p class="text-on-surface/50 mb-8 text-sm capitalize">{dateStr}</p>
+
+  {matches.length === 0 ? (
+    <div class="text-center py-16">
+      <p class="text-on-surface/50 text-lg">No hay partidos disponibles en este momento.</p>
+      <p class="text-on-surface/30 text-sm mt-2">Los partidos se actualizan cada 3 horas.</p>
+    </div>
+  ) : (
+    <div class="space-y-10">
+      {Object.entries(grouped).map(([countryName, group]) => (
+        <section>
+          <div class="flex items-center gap-3 mb-4 pb-3 border-b border-white/5">
+            {group.country.flagUrl && (
+              <img
+                src={group.country.flagUrl}
+                alt={`Bandera de ${countryName}`}
+                width="28"
+                height="20"
+                loading="lazy"
+                class="rounded-sm"
+              />
+            )}
+            <h2 class="text-lg font-bold text-on-surface/80">{countryName}</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {group.matches.map((event) => {
+              const { league, teams } = parseMatch(event);
+              const country = getCountry(event);
+              const channels = getChannels(event);
+              const slug = toSlug(event);
+
+              return (
+                <MatchCard
+                  id={event.id}
+                  slug={slug}
+                  title={event.attributes?.diary_description || ''}
+                  league={league}
+                  teams={teams}
+                  hour={event.attributes?.diary_hour || ''}
+                  date={event.attributes?.date_diary || ''}
+                  country={country.name}
+                  flagUrl={country.flagUrl}
+                  channels={channels}
+                />
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  )}
+</Base>

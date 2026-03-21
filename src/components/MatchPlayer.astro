@@ -1,0 +1,65 @@
+---
+export interface Embed {
+  name: string;
+  url: string;
+}
+
+export interface Props {
+  embeds: Embed[];
+  matchTitle: string;
+}
+
+const { embeds, matchTitle } = Astro.props;
+const hasEmbeds = embeds && embeds.length > 0;
+const primaryEmbed = hasEmbeds ? embeds[0] : null;
+---
+
+<div class="match-player">
+  {hasEmbeds && primaryEmbed && (
+    <div class="player-container mb-4">
+      <iframe
+        id="match-iframe"
+        src={primaryEmbed.url}
+        title={`Ver ${matchTitle} en vivo`}
+        allowfullscreen
+        scrolling="no"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+      ></iframe>
+    </div>
+  )}
+
+  {hasEmbeds && embeds.length > 1 && (
+    <div class="flex flex-wrap gap-2 mb-4">
+      <span class="text-sm text-on-surface/50 font-medium self-center mr-1">Canales:</span>
+      {embeds.map((embed, i) => (
+        <button
+          class={`channel-tab ${i === 0 ? 'active' : ''}`}
+          data-url={embed.url}
+          type="button"
+        >
+          {embed.name}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {!hasEmbeds && (
+    <div class="player-container mb-4 flex items-center justify-center bg-surface-variant border border-white/5">
+      <p class="text-on-surface/50 text-center p-8">
+        Este partido no tiene transmisión disponible aún.
+      </p>
+    </div>
+  )}
+</div>
+
+<script is:inline>
+  document.querySelectorAll('.channel-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var iframe = document.querySelector('#match-iframe');
+      if (iframe) iframe.src = tab.dataset.url;
+      document.querySelectorAll('.channel-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+</script>
