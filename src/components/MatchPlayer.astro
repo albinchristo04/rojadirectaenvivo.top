@@ -1,25 +1,36 @@
 ---
-export interface Embed {
+export interface Channel {
+  id: string;
+  lang: string;
   name: string;
   url: string;
 }
 
 export interface Props {
-  embeds: Embed[];
+  channels: Channel[];
   matchTitle: string;
 }
 
-const { embeds, matchTitle } = Astro.props;
-const hasEmbeds = embeds && embeds.length > 0;
-const primaryEmbed = hasEmbeds ? embeds[0] : null;
+const { channels, matchTitle } = Astro.props;
+const hasChannels = channels && channels.length > 0;
+const primaryChannel = hasChannels ? channels[0] : null;
+
+const langLabels: Record<string, string> = {
+  es: 'Español', fr: 'Français', gb: 'English', de: 'Deutsch', it: 'Italiano',
+  pt: 'Português', nl: 'Nederlands', us: 'English', br: 'Português',
+};
+const langFlags: Record<string, string> = {
+  es: '🇪🇸', fr: '🇫🇷', gb: '🇬🇧', de: '🇩🇪', it: '🇮🇹',
+  pt: '🇵🇹', nl: '🇳🇱', us: '🇺🇸', br: '🇧🇷',
+};
 ---
 
 <div class="match-player">
-  {hasEmbeds && primaryEmbed && (
+  {hasChannels && primaryChannel && (
     <div class="player-container mb-4">
       <iframe
         id="match-iframe"
-        src={primaryEmbed.url}
+        src={primaryChannel.url}
         title={`Ver ${matchTitle} en vivo`}
         allowfullscreen
         scrolling="no"
@@ -29,22 +40,22 @@ const primaryEmbed = hasEmbeds ? embeds[0] : null;
     </div>
   )}
 
-  {hasEmbeds && embeds.length > 1 && (
+  {hasChannels && channels.length > 1 && (
     <div class="flex flex-wrap gap-2 mb-4">
       <span class="text-sm text-on-surface/50 font-medium self-center mr-1">Canales:</span>
-      {embeds.map((embed, i) => (
+      {channels.map((ch, i) => (
         <button
           class={`channel-tab ${i === 0 ? 'active' : ''}`}
-          data-url={embed.url}
+          data-url={ch.url}
           type="button"
         >
-          {embed.name}
+          {langFlags[ch.lang] || '📺'} {ch.name} ({langLabels[ch.lang] || ch.lang})
         </button>
       ))}
     </div>
   )}
 
-  {!hasEmbeds && (
+  {!hasChannels && (
     <div class="player-container mb-4 flex items-center justify-center bg-surface-variant border border-white/5">
       <p class="text-on-surface/50 text-center p-8">
         Este partido no tiene transmisión disponible aún.

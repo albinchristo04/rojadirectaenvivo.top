@@ -3,36 +3,14 @@ import Base from '../layouts/Base.astro';
 import MatchCard from '../components/MatchCard.astro';
 
 import matchDataRaw from '../data/matches.json';
-const matchData = matchDataRaw;
 
-const matches = matchData.data || [];
+const events = matchDataRaw.events || [];
 
-function parseMatch(event) {
-  const desc = (event.attributes?.diary_description || '').trim().replace(/\s+/g, ' ');
-  const colonIdx = desc.indexOf(':');
-  const league = colonIdx > -1 ? desc.slice(0, colonIdx).trim() : '';
-  const teams = colonIdx > -1 ? desc.slice(colonIdx + 1).trim() : desc;
-  return { league, teams };
-}
-
-function toSlug(event) {
-  const desc = (event.attributes?.diary_description || '')
+function toSlug(event: any) {
+  const desc = `${event.league} ${event.teams}`
     .toLowerCase().trim().replace(/\s+/g, ' ')
     .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
   return `${event.id}-${desc}`;
-}
-
-function getCountry(event) {
-  const countryData = event.attributes?.country?.data?.attributes;
-  return {
-    name: countryData?.name || 'Internacional',
-    flagUrl: countryData?.image?.data?.attributes?.url || '',
-  };
-}
-
-function getChannels(event) {
-  const embeds = event.attributes?.embeds?.data || [];
-  return embeds.map(e => e.attributes?.embed_name || 'Canal').filter(Boolean);
 }
 
 const title = 'Rojadirecta en Vivo – Ver Fútbol Online Gratis | Tarjeta Roja TV';
@@ -75,25 +53,20 @@ const canonicalUrl = 'https://rojadirectaenvivo.top/rojadirecta-en-vivo/';
 
   <h2 class="text-xl font-bold text-on-surface/80 mb-4">Partidos de Hoy</h2>
 
-  {matches.length > 0 ? (
+  {events.length > 0 ? (
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {matches.map((event) => {
-        const { league, teams } = parseMatch(event);
-        const country = getCountry(event);
-        const channels = getChannels(event);
+      {events.map((event: any) => {
         const slug = toSlug(event);
         return (
           <MatchCard
             id={event.id}
             slug={slug}
-            title={event.attributes?.diary_description || ''}
-            league={league}
-            teams={teams}
-            hour={event.attributes?.diary_hour || ''}
-            date={event.attributes?.date_diary || ''}
-            country={country.name}
-            flagUrl={country.flagUrl}
-            channels={channels}
+            title={`${event.league}: ${event.teams}`}
+            league={event.league}
+            teams={event.teams}
+            time={event.time}
+            date={event.date}
+            channels={event.channels}
           />
         );
       })}

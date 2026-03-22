@@ -1,56 +1,44 @@
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync, mkdirSync } from 'fs';
 
-const JSON_URL = 'https://raw.githubusercontent.com/albinchristo04/ptv/refs/heads/main/futbollibre.json';
-const FLAGS_BASE = 'https://pltvhd.com';
+const JSON_URL = 'https://raw.githubusercontent.com/albinchristo04/arda/refs/heads/main/rereyano_data.json';
 const OUTPUT_JSON = './src/data/matches.json';
-const FLAGS_DIR = './public/flags';
 
 async function main() {
-  // 1. Fetch JSON
-  console.log('📥 Fetching match data...');
+  console.log('📥 Fetching match data from rereyano...');
   const res = await fetch(JSON_URL);
   if (!res.ok) throw new Error(`Failed to fetch JSON: ${res.status}`);
-  const data = await res.json();
+  const raw = await res.json();
 
-  // 2. Download flag images
-  mkdirSync(FLAGS_DIR, { recursive: true });
   mkdirSync('./src/data', { recursive: true });
 
-  const flagsDownloaded = [];
+  // Transform events into our normalized format
+  const events = (raw.events || []).map((ev, index) => ({
+    id: index + 1,
+    league: ev.league || '',
+    teams: ev.teams || '',
+    time: ev.time || '',
+    date: ev.date || '',
+    datetime: ev.datetime || '',
+    channels: (ev.channels || []).map(ch => ({
+      id: ch.id,
+      lang: ch.lang || 'es',
+      name: `CH${ch.id}`,
+      url: `https://cartelive.club/player/${ch.id}/1`,
+    })),
+  }));
 
-  for (const event of data.data) {
-    const imageData = event.attributes?.country?.data?.attributes?.image?.data?.attributes;
-    if (imageData?.url) {
-      const filename = imageData.url.split('/').pop();
-      const localPath = join(FLAGS_DIR, filename);
+  // Extract player_streams for global players
+  const playerStreams = raw.player_streams || {};
 
-      if (!existsSync(localPath)) {
-        try {
-          const imgRes = await fetch(FLAGS_BASE + imageData.url);
-          if (imgRes.ok) {
-            const buffer = await imgRes.arrayBuffer();
-            writeFileSync(localPath, Buffer.from(buffer));
-            flagsDownloaded.push(filename);
-          } else {
-            console.warn(`⚠️ Failed to download flag: ${imageData.url} (${imgRes.status})`);
-          }
-        } catch (err) {
-          console.warn(`⚠️ Error downloading flag: ${imageData.url}`, err.message);
-        }
-      }
+  const output = {
+    lastUpdated: raw.last_updated || new Date().toISOString(),
+    totalEvents: events.length,
+    events,
+    playerStreams,
+  };
 
-      // Rewrite URL to local path
-      imageData.url = `/flags/${filename}`;
-    }
-  }
-
-  // 3. Write processed JSON
-  writeFileSync(OUTPUT_JSON, JSON.stringify(data, null, 2));
-  console.log(`✅ Fetched ${data.data.length} matches. Data written to ${OUTPUT_JSON}`);
-  if (flagsDownloaded.length > 0) {
-    console.log(`🏳️ Downloaded ${flagsDownloaded.length} new flag images.`);
-  }
+  writeFileSync(OUTPUT_JSON, JSON.stringify(output, null, 2));
+  console.log(`✅ Fetched ${events.length} events. Data written to ${OUTPUT_JSON}`);
 }
 
 main().catch(console.error);
