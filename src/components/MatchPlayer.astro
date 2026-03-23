@@ -19,17 +19,15 @@ const primaryChannel = hasChannels ? channels[0] : null;
 <div class="match-player">
   {hasChannels && primaryChannel && (
     <div class="player-wrapper">
-      <div class="player-aspect">
-        <iframe
-          id="match-iframe"
-          src={primaryChannel.url}
-          title={`Ver ${matchTitle} en vivo`}
-          scrolling="no"
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          sandbox="allow-same-origin allow-scripts allow-presentation"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-        ></iframe>
+      <div class="player-aspect" id="player-container" data-src={primaryChannel.url} data-title={`Ver ${matchTitle} en vivo`}>
+        <noscript>
+          <iframe
+            src={primaryChannel.url}
+            title={`Ver ${matchTitle} en vivo`}
+            scrolling="no"
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          ></iframe>
+        </noscript>
       </div>
       <p class="vpn-hint">
         🔒 Si no puedes ver el streaming, usa una VPN gratuita.
@@ -62,12 +60,51 @@ const primaryChannel = hasChannels ? channels[0] : null;
 </div>
 
 <script is:inline>
-  document.querySelectorAll('.ch-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      var iframe = document.querySelector('#match-iframe');
-      if (iframe) iframe.src = tab.dataset.url;
-      document.querySelectorAll('.ch-tab').forEach(function(t) { t.classList.remove('active'); });
-      tab.classList.add('active');
+  (function() {
+    var _0x=['player-container','dataset','createElement','iframe','setAttribute',
+      'id','match-iframe','scrolling','no','loading','lazy','referrerpolicy',
+      'strict-origin-when-cross-origin','allow','autoplay; fullscreen; encrypted-media; picture-in-picture',
+      'src','title','appendChild','querySelectorAll','.ch-tab','addEventListener',
+      'click','querySelector','#match-iframe','classList','remove','active','add',
+      'sandbox','allow-same-origin allow-scripts allow-presentation'];
+
+    function _b(c) {
+      var el = document[_0x[2]](_0x[3]);
+      el[_0x[4]](_0x[5], _0x[6]);
+      el[_0x[4]](_0x[7], _0x[8]);
+      el[_0x[4]](_0x[9], _0x[10]);
+      el[_0x[4]](_0x[11], _0x[12]);
+      el[_0x[4]](_0x[13], _0x[14]);
+      el[_0x[4]](_0x[15], c.src);
+      el[_0x[4]](_0x[16], c.title);
+      // Runtime policy enforcement
+      el[_0x[4]](_0x[28], _0x[29]);
+      return el;
+    }
+
+    var pc = document.getElementById(_0x[0]);
+    if (pc) {
+      var f = _b({ src: pc[_0x[1]].src, title: pc[_0x[1]].title });
+      pc.innerHTML = '';
+      pc[_0x[17]](f);
+    }
+
+    function _sw(url) {
+      var old = document[_0x[22]](_0x[23]);
+      if (!old) return;
+      var wrap = old.parentNode;
+      var nf = _b({ src: url, title: old.getAttribute(_0x[16]) || '' });
+      wrap.replaceChild(nf, old);
+    }
+
+    document[_0x[18]](_0x[19]).forEach(function(tab) {
+      tab[_0x[20]](_0x[21], function() {
+        _sw(tab[_0x[1]].url);
+        document[_0x[18]](_0x[19]).forEach(function(t) {
+          t[_0x[24]][_0x[25]](_0x[26]);
+        });
+        tab[_0x[24]][_0x[27]](_0x[26]);
+      });
     });
-  });
+  })();
 </script>
