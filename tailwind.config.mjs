@@ -1,22 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  content: ['./src/**/*.{astro,html,js}'],
+  corePlugins: {
+    preflight: false,  // Disable Tailwind reset — use our own global.css
+  },
   theme: {
     extend: {
       colors: {
-        primary: '#D32F2F',
-        'on-primary': '#FFFFFF',
-        surface: '#121212',
-        'on-surface': '#E0E0E0',
-        'surface-variant': '#1E1E1E',
-        secondary: '#FF6F00',
-        'surface-dim': '#0A0A0A',
-        'surface-bright': '#2A2A2A',
+        red: { DEFAULT: '#E8001D' },
+        amber: { DEFAULT: '#FF9500' },
       },
       fontFamily: {
-        sans: ['Roboto', 'system-ui', 'sans-serif'],
+        display: ['Bebas Neue', 'sans-serif'],
+        condensed: ['Barlow Condensed', 'sans-serif'],
+        body: ['Barlow', 'sans-serif'],
       },
     },
   },
-  plugins: [],
 };

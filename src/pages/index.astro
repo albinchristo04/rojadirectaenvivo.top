@@ -27,15 +27,6 @@ for (const key in grouped) {
   grouped[key].sort((a: any, b: any) => (a.time || '').localeCompare(b.time || ''));
 }
 
-// Get today's date for display
-const today = new Date();
-const dateStr = today.toLocaleDateString('es-ES', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
-
 // League to emoji mapping
 const leagueFlags: Record<string, string> = {
   'Laliga': '🇪🇸', 'Laliga 2': '🇪🇸', 'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
@@ -47,6 +38,9 @@ const leagueFlags: Record<string, string> = {
   'Ecuador Ligapro': '🇪🇨', 'Premiership': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
   'NBA': '🇺🇸', 'NHL': '🇺🇸', 'NFL': '🇺🇸', 'MLB': '🇺🇸',
 };
+
+// Build ticker text
+const tickerText = events.map((e: any) => e.teams).join(' · ');
 
 const title = 'Rojadirecta en Vivo 🔴 Fútbol en Vivo Gratis | Tarjeta Roja TV Pirlo TV';
 const description = 'Ver fútbol en vivo gratis hoy. Rojadirecta en vivo, Tarjeta Roja, Pirlo TV - todos los partidos del día en rojadirectaenvivo.top';
@@ -68,46 +62,72 @@ const websiteSchema = {
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={websiteSchema}>
-  <h1 class="text-3xl md:text-4xl font-black mb-2 text-on-surface">
-    Rojadirecta en Vivo – Fútbol en Vivo Gratis Hoy
-  </h1>
-
-  <p class="text-on-surface/50 mb-8 text-sm capitalize">{dateStr}</p>
-
-  {events.length === 0 ? (
-    <div class="text-center py-16">
-      <p class="text-on-surface/50 text-lg">No hay partidos disponibles en este momento.</p>
-      <p class="text-on-surface/30 text-sm mt-2">Los partidos se actualizan cada 3 horas.</p>
-    </div>
-  ) : (
-    <div class="space-y-10">
-      {Object.entries(grouped).map(([leagueName, leagueMatches]) => (
-        <section>
-          <div class="flex items-center gap-3 mb-4 pb-3 border-b border-white/5">
-            <span class="text-xl">{leagueFlags[leagueName] || '⚽'}</span>
-            <h2 class="text-lg font-bold text-on-surface/80">{leagueName}</h2>
-            <span class="text-xs text-on-surface/40 ml-auto">{leagueMatches.length} partidos</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {leagueMatches.map((event: any) => {
-              const slug = toSlug(event);
-              return (
-                <MatchCard
-                  id={event.id}
-                  slug={slug}
-                  title={`${event.league}: ${event.teams}`}
-                  league={event.league}
-                  teams={event.teams}
-                  time={event.time}
-                  date={event.date}
-                  channels={event.channels}
-                />
-              );
-            })}
-          </div>
-        </section>
-      ))}
+  <!-- Ticker Bar -->
+  {events.length > 0 && (
+    <div class="ticker">
+      <div class="ticker-label">📡 EN VIVO HOY</div>
+      <div class="ticker-track">{tickerText} · {tickerText}</div>
     </div>
   )}
+
+  <div class="container" style="padding-top: 32px;">
+    <h1 class="keyword-h1" style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 8px;">
+      Rojadirecta en Vivo
+    </h1>
+    <p class="keyword-sub" style="margin-bottom: 32px;">Fútbol en vivo gratis — todos los partidos de hoy en directo</p>
+
+    {events.length === 0 ? (
+      <div style="text-align: center; padding: 64px 0;">
+        <p style="color: var(--c-text-secondary); font-size: 16px;">No hay partidos disponibles en este momento.</p>
+        <p style="color: var(--c-text-muted); font-size: 13px; margin-top: 8px;">Los partidos se actualizan cada 3 horas.</p>
+      </div>
+    ) : (
+      <div>
+        {Object.entries(grouped).map(([leagueName, leagueMatches]) => (
+          <section>
+            <div class="country-group-header">
+              <span style="font-size: 20px;">{leagueFlags[leagueName] || '⚽'}</span>
+              <span class="country-name">{leagueName}</span>
+              <div class="divider-line"></div>
+              <span class="match-count">{leagueMatches.length} partidos</span>
+            </div>
+
+            <div class="match-grid">
+              {leagueMatches.map((event: any) => {
+                const slug = toSlug(event);
+                return (
+                  <MatchCard
+                    id={event.id}
+                    slug={slug}
+                    title={`${event.league}: ${event.teams}`}
+                    league={event.league}
+                    teams={event.teams}
+                    time={event.time}
+                    date={event.date}
+                    channels={event.channels}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+    )}
+
+    <!-- SEO Text -->
+    <section class="seo-text">
+      <h2>Rojadirecta en Vivo – Ver Fútbol Gratis</h2>
+      <p>
+        Bienvenido a <strong>Rojadirecta en Vivo</strong>, tu destino para ver fútbol en vivo gratis hoy.
+        Aquí encontrarás todos los partidos del día transmitidos en directo, igual que en
+        <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
+        Disfruta de la <strong>roja directa</strong> sin cortes y en alta definición.
+      </p>
+      <p>
+        Seguimos todos los campeonatos en vivo: LaLiga, Premier League, Serie A, Bundesliga,
+        Liga MX, Liga Profesional Argentina, Copa Libertadores y mucho más.
+        Ver <strong>futbol en vivo</strong> nunca fue tan fácil — sin registro, sin pago, gratis.
+      </p>
+    </section>
+  </div>
 </Base>

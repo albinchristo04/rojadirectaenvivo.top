@@ -19,61 +19,64 @@ const canonicalUrl = 'https://rojadirectaenvivo.top/tarjeta-roja/';
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl}>
-  <h1 class="text-3xl md:text-4xl font-black mb-6 text-on-surface">
-    Tarjeta Roja – Ver Partidos en Vivo Gratis
-  </h1>
+  <div class="container">
+    <section class="keyword-hero">
+      <h1 class="keyword-h1">Tarjeta Roja</h1>
+      <p class="keyword-sub">Ver partidos en vivo gratis — fútbol en directo sin interrupciones</p>
+    </section>
 
-  <div class="prose prose-invert max-w-none mb-10">
-    <p class="text-on-surface/70 leading-relaxed">
-      <strong>Tarjeta Roja</strong> es uno de los nombres más conocidos en el mundo del streaming de fútbol en vivo.
-      En <strong>rojadirectaenvivo.top</strong> te ofrecemos la misma experiencia que <strong>Tarjeta Roja TV</strong>
-      con una interfaz moderna y actualizada. Aquí puedes ver todos los partidos del día sin registro y completamente gratis.
-    </p>
+    <div class="keyword-text">
+      <p>
+        <strong>Tarjeta Roja</strong> es uno de los nombres más conocidos en el mundo del streaming de fútbol en vivo.
+        En <strong>rojadirectaenvivo.top</strong> te ofrecemos la misma experiencia que <strong>Tarjeta Roja TV</strong>
+        con una interfaz moderna y actualizada. Aquí puedes ver todos los partidos del día sin registro y completamente gratis.
+      </p>
 
-    <p class="text-on-surface/70 leading-relaxed">
-      Si buscas <strong>tarjeta roja en vivo</strong>, has llegado al lugar correcto. Nuestra plataforma reúne
-      múltiples fuentes de transmisión para que puedas disfrutar del fútbol en directo sin interrupciones.
-      Ya sea LaLiga, Premier League, Champions League, Copa Libertadores o cualquier otra competición,
-      la <strong>tarjeta roja directa</strong> está aquí para ti.
-    </p>
+      <p>
+        Si buscas <strong>tarjeta roja en vivo</strong>, has llegado al lugar correcto. Nuestra plataforma reúne
+        múltiples fuentes de transmisión para que puedas disfrutar del fútbol en directo sin interrupciones.
+        Ya sea LaLiga, Premier League, Champions League, Copa Libertadores o cualquier otra competición,
+        la <strong>tarjeta roja directa</strong> está aquí para ti.
+      </p>
 
-    <p class="text-on-surface/70 leading-relaxed">
-      A diferencia de otros sitios, en <strong>Tarjeta Roja</strong> de rojadirectaenvivo.top ofrecemos
-      varias opciones de canales por partido. Si un canal no funciona, simplemente cambia al siguiente.
-      Nuestro contenido se actualiza automáticamente cada 3 horas con los últimos partidos disponibles.
-      <strong>Rojadirecta</strong> y <strong>Pirlo TV</strong> son algunas de las alternativas que también
-      encontrarás en nuestra plataforma.
-    </p>
+      <p>
+        A diferencia de otros sitios, en <strong>Tarjeta Roja</strong> de rojadirectaenvivo.top ofrecemos
+        varias opciones de canales por partido. Si un canal no funciona, simplemente cambia al siguiente.
+        Nuestro contenido se actualiza automáticamente cada 3 horas con los últimos partidos disponibles.
+        <strong>Rojadirecta</strong> y <strong>Pirlo TV</strong> son algunas de las alternativas que también
+        encontrarás en nuestra plataforma.
+      </p>
 
-    <p class="text-on-surface/70 leading-relaxed">
-      Ver <strong>fútbol en vivo gratis</strong> nunca fue tan sencillo. Con <strong>Tarjeta Roja TV</strong>
-      en rojadirectaenvivo.top tienes acceso a partidos de todo el mundo, desde ligas sudamericanas
-      hasta las mejores competiciones europeas. Todo el <strong>futbol en vivo</strong> en un solo lugar,
-      sin pagar, sin registrarse, solo <strong>roja directa</strong> pura.
-    </p>
-  </div>
-
-  <h2 class="text-xl font-bold text-on-surface/80 mb-4">Partidos de Hoy</h2>
-
-  {events.length > 0 ? (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {events.map((event: any) => {
-        const slug = toSlug(event);
-        return (
-          <MatchCard
-            id={event.id}
-            slug={slug}
-            title={`${event.league}: ${event.teams}`}
-            league={event.league}
-            teams={event.teams}
-            time={event.time}
-            date={event.date}
-            channels={event.channels}
-          />
-        );
-      })}
+      <p>
+        Ver <strong>fútbol en vivo gratis</strong> nunca fue tan sencillo. Con <strong>Tarjeta Roja TV</strong>
+        en rojadirectaenvivo.top tienes acceso a partidos de todo el mundo, desde ligas sudamericanas
+        hasta las mejores competiciones europeas. Todo el <strong>futbol en vivo</strong> en un solo lugar,
+        sin pagar, sin registrarse, solo <strong>roja directa</strong> pura.
+      </p>
     </div>
-  ) : (
-    <p class="text-on-surface/50">No hay partidos disponibles en este momento.</p>
-  )}
+
+    <h2 class="keyword-text-title">Partidos de Hoy</h2>
+
+    {events.length > 0 ? (
+      <div class="match-grid">
+        {events.map((event: any) => {
+          const slug = toSlug(event);
+          return (
+            <MatchCard
+              id={event.id}
+              slug={slug}
+              title={`${event.league}: ${event.teams}`}
+              league={event.league}
+              teams={event.teams}
+              time={event.time}
+              date={event.date}
+              channels={event.channels}
+            />
+          );
+        })}
+      </div>
+    ) : (
+      <p style="color: var(--c-text-secondary);">No hay partidos disponibles en este momento.</p>
+    )}
+  </div>
 </Base>

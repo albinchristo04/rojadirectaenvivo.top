@@ -19,59 +19,62 @@ const canonicalUrl = 'https://rojadirectaenvivo.top/rojadirecta-en-vivo/';
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl}>
-  <h1 class="text-3xl md:text-4xl font-black mb-6 text-on-surface">
-    Rojadirecta en Vivo – Fútbol en Vivo Gratis
-  </h1>
+  <div class="container">
+    <section class="keyword-hero">
+      <h1 class="keyword-h1">Rojadirecta en Vivo</h1>
+      <p class="keyword-sub">Fútbol en vivo gratis — todos los partidos de hoy en directo</p>
+    </section>
 
-  <div class="prose prose-invert max-w-none mb-10">
-    <p class="text-on-surface/70 leading-relaxed">
-      <strong>Rojadirecta en Vivo</strong> es tu portal definitivo para ver <strong>fútbol en vivo gratis</strong> desde cualquier lugar del mundo.
-      Nuestra plataforma te ofrece acceso directo a todos los partidos del día, con múltiples canales de transmisión para que nunca te pierdas un gol.
-      Somos la alternativa perfecta a <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
-    </p>
+    <div class="keyword-text">
+      <p>
+        <strong>Rojadirecta en Vivo</strong> es tu portal definitivo para ver <strong>fútbol en vivo gratis</strong> desde cualquier lugar del mundo.
+        Nuestra plataforma te ofrece acceso directo a todos los partidos del día, con múltiples canales de transmisión para que nunca te pierdas un gol.
+        Somos la alternativa perfecta a <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
+      </p>
 
-    <p class="text-on-surface/70 leading-relaxed">
-      En <strong>rojadirectaenvivo.top</strong> encontrarás transmisiones en vivo de las mejores ligas del mundo:
-      LaLiga Española, Premier League, Serie A, Bundesliga, Liga MX, Liga Profesional Argentina,
-      Copa Libertadores, Champions League y muchas más. Todo gratis y sin necesidad de registro.
-    </p>
+      <p>
+        En <strong>rojadirectaenvivo.top</strong> encontrarás transmisiones en vivo de las mejores ligas del mundo:
+        LaLiga Española, Premier League, Serie A, Bundesliga, Liga MX, Liga Profesional Argentina,
+        Copa Libertadores, Champions League y muchas más. Todo gratis y sin necesidad de registro.
+      </p>
 
-    <p class="text-on-surface/70 leading-relaxed">
-      La <strong>roja directa</strong> nunca fue tan fácil de acceder. Con solo un clic puedes ver tu partido favorito
-      en vivo y en directo. Nuestros streams se actualizan cada 3 horas para garantizar que siempre tengas
-      la información más reciente. Ya sea que busques <strong>rojadirecta</strong>, <strong>tarjeta roja en vivo</strong>
-      o <strong>pirlo tv rojadirecta</strong>, aquí encontrarás todo lo que necesitas.
-    </p>
+      <p>
+        La <strong>roja directa</strong> nunca fue tan fácil de acceder. Con solo un clic puedes ver tu partido favorito
+        en vivo y en directo. Nuestros streams se actualizan cada 3 horas para garantizar que siempre tengas
+        la información más reciente. Ya sea que busques <strong>rojadirecta</strong>, <strong>tarjeta roja en vivo</strong>
+        o <strong>pirlo tv rojadirecta</strong>, aquí encontrarás todo lo que necesitas.
+      </p>
 
-    <p class="text-on-surface/70 leading-relaxed">
-      No importa si estás en España, Argentina, México, Colombia o cualquier otro país hispanohablante —
-      <strong>Rojadirecta en Vivo</strong> funciona en todo el mundo. Ver <strong>futbol en vivo</strong>
-      gratis es posible gracias a nuestra red de canales y transmisiones. Disfruta del mejor
-      <strong>fútbol en vivo gratis hoy</strong> sin complicaciones.
-    </p>
-  </div>
-
-  <h2 class="text-xl font-bold text-on-surface/80 mb-4">Partidos de Hoy</h2>
-
-  {events.length > 0 ? (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {events.map((event: any) => {
-        const slug = toSlug(event);
-        return (
-          <MatchCard
-            id={event.id}
-            slug={slug}
-            title={`${event.league}: ${event.teams}`}
-            league={event.league}
-            teams={event.teams}
-            time={event.time}
-            date={event.date}
-            channels={event.channels}
-          />
-        );
-      })}
+      <p>
+        No importa si estás en España, Argentina, México, Colombia o cualquier otro país hispanohablante —
+        <strong>Rojadirecta en Vivo</strong> funciona en todo el mundo. Ver <strong>futbol en vivo</strong>
+        gratis es posible gracias a nuestra red de canales y transmisiones. Disfruta del mejor
+        <strong>fútbol en vivo gratis hoy</strong> sin complicaciones.
+      </p>
     </div>
-  ) : (
-    <p class="text-on-surface/50">No hay partidos disponibles en este momento.</p>
-  )}
+
+    <h2 class="keyword-text-title">Partidos de Hoy</h2>
+
+    {events.length > 0 ? (
+      <div class="match-grid">
+        {events.map((event: any) => {
+          const slug = toSlug(event);
+          return (
+            <MatchCard
+              id={event.id}
+              slug={slug}
+              title={`${event.league}: ${event.teams}`}
+              league={event.league}
+              teams={event.teams}
+              time={event.time}
+              date={event.date}
+              channels={event.channels}
+            />
+          );
+        })}
+      </div>
+    ) : (
+      <p style="color: var(--c-text-secondary);">No hay partidos disponibles en este momento.</p>
+    )}
+  </div>
 </Base>

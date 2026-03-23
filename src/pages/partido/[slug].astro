@@ -7,7 +7,6 @@ import matchDataRaw from '../../data/matches.json';
 
 const allEvents = matchDataRaw.events || [];
 
-// Helper: generate slug
 function toSlug(event: any) {
   const desc = `${event.league} ${event.teams}`
     .toLowerCase().trim().replace(/\s+/g, ' ')
@@ -15,10 +14,8 @@ function toSlug(event: any) {
   return `${event.id}-${desc}`;
 }
 
-// Generate static paths for all events
 export function getStaticPaths() {
   const events = matchDataRaw.events || [];
-
   return events.map((event: any) => {
     const desc = `${event.league} ${event.teams}`
       .toLowerCase().trim().replace(/\s+/g, ' ')
@@ -31,15 +28,18 @@ export function getStaticPaths() {
 const { event } = Astro.props;
 const slug = toSlug(event);
 
-// Convert DD-MM-YYYY to YYYY-MM-DD for schema
 const dateParts = (event.date || '').split('-');
 const isoDate = dateParts.length === 3 ? `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}` : event.date;
 
-// Related matches (up to 4 others from same league or any)
+// Parse team names for hero display
+const teamNames = (event.teams || 'vs').split(/\s+vs\s+/i);
+const teamA = teamNames[0]?.trim() || 'Equipo A';
+const teamB = teamNames[1]?.trim() || 'Equipo B';
+
+// Related matches
 const relatedMatches = allEvents
   .filter((m: any) => m.id !== event.id)
   .sort((a: any, b: any) => {
-    // Prioritize same league
     const aScore = a.league === event.league ? 0 : 1;
     const bScore = b.league === event.league ? 0 : 1;
     return aScore - bScore;
@@ -59,14 +59,8 @@ const sportsEventSchema = {
   "sport": "Fútbol",
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
-  "location": {
-    "@type": "VirtualLocation",
-    "url": canonicalUrl
-  },
-  "organizer": {
-    "@type": "Organization",
-    "name": event.league
-  }
+  "location": { "@type": "VirtualLocation", "url": canonicalUrl },
+  "organizer": { "@type": "Organization", "name": event.league }
 };
 
 const langFlags: Record<string, string> = {
@@ -76,29 +70,46 @@ const langFlags: Record<string, string> = {
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={sportsEventSchema}>
-  <!-- Breadcrumb -->
-  <nav class="breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Inicio</a>
-    <span>›</span>
-    <span>{event.league}</span>
-    <span>›</span>
-    <span class="text-on-surface/70">{event.teams}</span>
-  </nav>
+  <!-- Match Header -->
+  <section class="match-header">
+    <nav class="match-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Inicio</a>
+      <span>›</span>
+      <span>{event.league}</span>
+      <span>›</span>
+      <span>{event.teams}</span>
+    </nav>
 
-  <div class="lg:grid lg:grid-cols-[1fr_320px] lg:gap-8">
-    <!-- Main content -->
+    <div class="match-league-badge">
+      <span>{event.league}</span>
+    </div>
+
+    <div class="match-teams-hero">
+      <span class="match-team">{teamA}</span>
+      <div class="match-versus">
+        <span class="versus-line"></span>
+        <span>VS</span>
+        <span class="versus-line"></span>
+      </div>
+      <span class="match-team">{teamB}</span>
+    </div>
+
+    <div class="match-time-row">
+      <span>📅 {event.date}</span>
+      <span>•</span>
+      <span class="time-local">🕐 {event.time} ARG</span>
+      <span>•</span>
+      <LocalTime hour={event.time} date={isoDate} id={String(event.id)} />
+    </div>
+  </section>
+
+  <!-- Two-column layout -->
+  <div class="match-layout">
     <div>
-      <h1 class="text-2xl md:text-3xl font-black mb-2 text-on-surface">
-        {event.teams} en Vivo
-      </h1>
-      <h2 class="text-on-surface/50 mb-6 text-sm">
-        {event.league} – {event.date} – {event.time} hora Argentina
-      </h2>
-
       <!-- Player -->
       <MatchPlayer channels={event.channels} matchTitle={event.teams} />
 
-      <!-- Match SEO text -->
+      <!-- SEO text -->
       <section class="seo-text">
         <h2>Ver {event.teams} en Vivo Gratis</h2>
         <p>
@@ -117,41 +128,31 @@ const langFlags: Record<string, string> = {
     </div>
 
     <!-- Sidebar -->
-    <aside class="mt-8 lg:mt-0">
-      <div class="bg-surface-variant rounded-2xl border border-white/5 p-5 mb-6">
-        <h3 class="text-sm font-bold text-on-surface/70 uppercase tracking-wider mb-4">Información del Partido</h3>
+    <aside>
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">Información del Partido</h3>
 
-        <div class="space-y-3 text-sm">
-          <div class="flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-on-surface/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="text-on-surface/70">{event.league}</span>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-on-surface/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="text-on-surface/70">{event.time} hora Argentina</span>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-on-surface/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span class="text-on-surface/70">{event.date}</span>
-          </div>
-
-          <div class="pt-2">
-            <LocalTime hour={event.time} date={isoDate} id={String(event.id)} />
-          </div>
+        <div class="sidebar-row">
+          <span>🏆</span>
+          <span>{event.league}</span>
+        </div>
+        <div class="sidebar-row">
+          <span>🕐</span>
+          <span>{event.time} hora Argentina</span>
+        </div>
+        <div class="sidebar-row">
+          <span>📅</span>
+          <span>{event.date}</span>
+        </div>
+        <div class="sidebar-row">
+          <LocalTime hour={event.time} date={isoDate} id={`sidebar-${event.id}`} />
         </div>
 
         {event.channels && event.channels.length > 0 && (
-          <div class="mt-4 pt-4 border-t border-white/5">
-            <h4 class="text-xs font-bold text-on-surface/50 uppercase mb-2">Canales Disponibles</h4>
-            <div class="flex flex-wrap gap-1.5">
+          <div>
+            <div class="sidebar-divider"></div>
+            <h4 class="sidebar-title" style="margin-top:0;">Canales Disponibles</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">
               {event.channels.map((ch: any) => (
                 <span class="channel-badge">{langFlags[ch.lang] || '📺'} {ch.name}</span>
               ))}
@@ -160,11 +161,10 @@ const langFlags: Record<string, string> = {
         )}
       </div>
 
-      <!-- Related matches -->
       {relatedMatches.length > 0 && (
-        <div>
-          <h3 class="text-sm font-bold text-on-surface/70 uppercase tracking-wider mb-4">Ver más partidos</h3>
-          <div class="space-y-3">
+        <div style="margin-top:24px;">
+          <h3 class="sidebar-title">Ver Más Partidos</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
             {relatedMatches.map((m: any) => {
               const mSlug = toSlug(m);
               return (

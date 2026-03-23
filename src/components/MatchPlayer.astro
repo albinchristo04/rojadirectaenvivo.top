@@ -14,62 +14,55 @@ export interface Props {
 const { channels, matchTitle } = Astro.props;
 const hasChannels = channels && channels.length > 0;
 const primaryChannel = hasChannels ? channels[0] : null;
-
-const langLabels: Record<string, string> = {
-  es: 'Español', fr: 'Français', gb: 'English', de: 'Deutsch', it: 'Italiano',
-  pt: 'Português', nl: 'Nederlands', us: 'English', br: 'Português',
-};
-const langFlags: Record<string, string> = {
-  es: '🇪🇸', fr: '🇫🇷', gb: '🇬🇧', de: '🇩🇪', it: '🇮🇹',
-  pt: '🇵🇹', nl: '🇳🇱', us: '🇺🇸', br: '🇧🇷',
-};
 ---
 
 <div class="match-player">
   {hasChannels && primaryChannel && (
-    <div class="player-container mb-4">
-      <iframe
-        id="match-iframe"
-        src={primaryChannel.url}
-        title={`Ver ${matchTitle} en vivo`}
-        allowfullscreen
-        scrolling="no"
-        loading="lazy"
-        referrerpolicy="no-referrer"
-      ></iframe>
+    <div class="player-wrapper">
+      <div class="player-aspect">
+        <iframe
+          id="match-iframe"
+          src={primaryChannel.url}
+          title={`Ver ${matchTitle} en vivo`}
+          allowfullscreen
+          scrolling="no"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          allow="autoplay; encrypted-media; fullscreen"
+        ></iframe>
+      </div>
     </div>
   )}
 
   {hasChannels && channels.length > 1 && (
-    <div class="flex flex-wrap gap-2 mb-4">
-      <span class="text-sm text-on-surface/50 font-medium self-center mr-1">Canales:</span>
+    <div class="channel-tabs" role="tablist" aria-label="Canales disponibles">
       {channels.map((ch, i) => (
         <button
-          class={`channel-tab ${i === 0 ? 'active' : ''}`}
+          class={`ch-tab ${i === 0 ? 'active' : ''}`}
           data-url={ch.url}
+          role="tab"
           type="button"
         >
-          {langFlags[ch.lang] || '📺'} {ch.name} ({langLabels[ch.lang] || ch.lang})
+          <span class="ch-num">{i + 1}</span>
+          <span class="ch-name">{ch.name}</span>
         </button>
       ))}
     </div>
   )}
 
   {!hasChannels && (
-    <div class="player-container mb-4 flex items-center justify-center bg-surface-variant border border-white/5">
-      <p class="text-on-surface/50 text-center p-8">
-        Este partido no tiene transmisión disponible aún.
-      </p>
+    <div class="no-channels">
+      <p>Este partido no tiene transmisión disponible aún.</p>
     </div>
   )}
 </div>
 
 <script is:inline>
-  document.querySelectorAll('.channel-tab').forEach(function(tab) {
+  document.querySelectorAll('.ch-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       var iframe = document.querySelector('#match-iframe');
       if (iframe) iframe.src = tab.dataset.url;
-      document.querySelectorAll('.channel-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.ch-tab').forEach(function(t) { t.classList.remove('active'); });
       tab.classList.add('active');
     });
   });

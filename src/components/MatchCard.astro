@@ -13,80 +13,67 @@ export interface Props {
 
 const { id, slug, title, league, teams, time, date, channels, isLive } = Astro.props;
 
-// Language to emoji flag mapping
-const langFlags: Record<string, string> = {
-  es: '🇪🇸', fr: '🇫🇷', gb: '🇬🇧', de: '🇩🇪', it: '🇮🇹',
-  pt: '🇵🇹', nl: '🇳🇱', us: '🇺🇸', br: '🇧🇷', ar: '🇦🇷',
-  mx: '🇲🇽', co: '🇨🇴', cl: '🇨🇱', pe: '🇵🇪', uy: '🇺🇾',
-};
-
-// Get primary language from channels
-const primaryLang = channels.length > 0 ? channels[0].lang : 'es';
-const flag = langFlags[primaryLang] || '⚽';
-
-// Language labels
-const langLabels: Record<string, string> = {
-  es: 'Español', fr: 'Français', gb: 'English', de: 'Deutsch', it: 'Italiano',
-  pt: 'Português', nl: 'Nederlands', us: 'English', br: 'Português',
-};
+// Split teams for display
+const teamParts = teams.split(/\s+vs\.?\s+/i);
+const teamA = teamParts[0]?.trim() || teams;
+const teamB = teamParts[1]?.trim() || '';
 ---
 
-<a href={`/partido/${slug}/`} class="match-card block group" id={`match-${id}`}>
-  <div class="flex items-center gap-2 mb-3">
-    <span class="text-base">{flag}</span>
-    <span class="text-xs text-on-surface/50 font-medium uppercase tracking-wider">{league}</span>
-    {isLive && <span class="live-badge ml-auto">EN VIVO</span>}
+<a href={`/partido/${slug}/`} class={`match-card ${isLive ? 'is-live' : ''}`} id={`match-${id}`}>
+  <div class="card-league">{league}</div>
+
+  {isLive && (
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      EN VIVO
+    </div>
+  )}
+
+  <div class="card-teams">
+    <span class="team-a">{teamA}</span>
+    {teamB && (
+      <>
+        <span class="card-vs">VS</span>
+        <span class="team-b">{teamB}</span>
+      </>
+    )}
   </div>
 
-  <h2 class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors mb-2">
-    {teams}
-  </h2>
-
-  <div class="flex items-center gap-3 text-sm text-on-surface/60 mb-3">
-    <span class="inline-flex items-center gap-1.5">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      {time} ARG
-    </span>
-    <span class="text-on-surface/30">|</span>
-    <span>Tu hora: <span class="local-time" data-hour={time} data-date={date}>--:--</span></span>
+  <div class="card-meta">
+    <span>⏰ {time} ARG</span>
+    <span class="card-local-time" data-hour={time} data-date={date}>· Tu hora: --:--</span>
   </div>
 
-  <div class="flex items-center justify-between gap-3">
-    <div class="flex flex-wrap gap-1.5">
-      {channels.slice(0, 3).map((ch) => (
-        <span class="channel-badge">{ch.name} <span class="text-on-surface/40 text-[10px] ml-0.5">{langFlags[ch.lang] || ''}</span></span>
+  <div class="card-footer">
+    <div class="card-channels">
+      {channels.slice(0, 2).map((ch) => (
+        <span class="channel-badge">{ch.name}</span>
       ))}
-      {channels.length > 3 && (
-        <span class="channel-badge">+{channels.length - 3}</span>
+      {channels.length > 2 && (
+        <span class="channel-badge extra">+{channels.length - 2}</span>
       )}
     </div>
-    <span class="cta-button text-xs whitespace-nowrap">
-      ▶ Ver Partido
-    </span>
+    <span class="card-cta">▶ VER</span>
   </div>
 </a>
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.local-time').forEach(el => {
+    document.querySelectorAll('.card-local-time').forEach(el => {
       try {
         const hour = el.dataset.hour;
         const date = el.dataset.date;
         if (!hour || !date) return;
 
-        // Parse DD-MM-YYYY format
         const parts = date.split('-');
         const isoDate = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : date;
 
         const [h, m] = hour.split(':');
-        // Argentina time is UTC-3
         const argDate = new Date(`${isoDate}T${h.padStart(2, '0')}:${m.padStart(2, '0')}:00-03:00`);
         const localTime = argDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        el.textContent = localTime;
+        el.textContent = `· Tu hora: ${localTime}`;
       } catch {
-        el.textContent = '--:--';
+        el.textContent = '· Tu hora: --:--';
       }
     });
   });
