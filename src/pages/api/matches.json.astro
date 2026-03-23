@@ -1,0 +1,24 @@
+---
+import matchDataRaw from '../../data/matches.json';
+
+const events = matchDataRaw.events || [];
+
+const apiResponse = {
+  status: 'ok',
+  website: 'https://rojadirectaenvivo.top',
+  lastUpdated: matchDataRaw.lastUpdated || new Date().toISOString(),
+  totalMatches: events.length,
+  embedBaseUrl: 'https://rojadirectaenvivo.top/embed/',
+  matches: events.map((event: any) => ({
+    id: event.id,
+    league: event.league,
+    teams: event.teams,
+    date: event.date,
+    time: event.time,
+    embedUrl: `https://rojadirectaenvivo.top/embed/${event.id}/`,
+    iframeCode: `<iframe src="https://rojadirectaenvivo.top/embed/${event.id}/" width="100%" height="500" frameborder="0" allowfullscreen></iframe>`,
+    channels: (event.channels || []).length,
+  })),
+};
+---
+<Fragment set:html={JSON.stringify(apiResponse, null, 2)} />

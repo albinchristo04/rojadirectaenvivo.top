@@ -46,7 +46,9 @@ const relatedMatches = allEvents
   })
   .slice(0, 4);
 
-const title = `${event.teams} en Vivo 🔴 ${event.league} | Rojadirecta Tarjeta Roja`;
+// Keep title under 70 chars for Bing
+const rawTitle = `${event.teams} en Vivo 🔴 ${event.league} | Rojadirecta`;
+const title = rawTitle.length > 70 ? `${event.teams} en Vivo | Rojadirecta`.substring(0, 70) : rawTitle;
 const description = `Ver ${event.teams} en vivo gratis. ${event.league} en directo por rojadirecta, tarjeta roja, pirlo tv. Partido en vivo hoy ${event.date}.`;
 const canonicalUrl = `https://rojadirectaenvivo.top/partido/${slug}/`;
 

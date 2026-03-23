@@ -1,0 +1,262 @@
+---
+import Base from '../layouts/Base.astro';
+import matchDataRaw from '../data/matches.json';
+
+const events = matchDataRaw.events || [];
+
+function toSlug(event: any) {
+  const desc = `${event.league} ${event.teams}`
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+const title = 'Embed Partidos en Vivo | Rojadirecta para Webmasters';
+const description = 'Embede partidos de fútbol en vivo en tu sitio web. Código embed gratis para webmasters.';
+const canonicalUrl = 'https://rojadirectaenvivo.top/webmasters/';
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <section class="webmaster-hero">
+    <h1>📺 Embede Partidos en Tu Sitio Web</h1>
+    <p>Copia el código embed y pégalo en tu página para mostrar los partidos en vivo de <strong>Rojadirecta en Vivo</strong>.</p>
+  </section>
+
+  <section class="webmaster-api">
+    <h2>🔗 API para Desarrolladores</h2>
+    <p>Accede a todos los partidos disponibles mediante nuestra API JSON:</p>
+    <div class="api-box">
+      <code id="api-url">https://rojadirectaenvivo.top/api/matches.json</code>
+      <button class="copy-btn" data-copy="https://rojadirectaenvivo.top/api/matches.json" type="button">Copiar</button>
+    </div>
+  </section>
+
+  <section class="webmaster-matches">
+    <h2>⚽ Partidos Disponibles</h2>
+    <div class="embed-grid">
+      {events.map((event: any) => {
+        const embedUrl = `https://rojadirectaenvivo.top/embed/${event.id}/`;
+        const iframeCode = `<iframe src="${embedUrl}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>`;
+        const matchSlug = toSlug(event);
+        return (
+          <div class="embed-card">
+            <div class="embed-card-header">
+              <span class="embed-league">{event.league}</span>
+              <span class="embed-time">{event.time} - {event.date}</span>
+            </div>
+            <h3 class="embed-teams">{event.teams}</h3>
+            <div class="embed-preview">
+              <iframe src={embedUrl} loading="lazy" title={event.teams}></iframe>
+            </div>
+            <div class="embed-actions">
+              <div class="embed-code-box">
+                <textarea readonly rows="2" class="embed-textarea">{iframeCode}</textarea>
+              </div>
+              <div class="embed-buttons">
+                <button class="copy-btn" data-copy={iframeCode} type="button">📋 Copiar Código</button>
+                <button class="share-btn" data-url={embedUrl} data-text={`Ver ${event.teams} en vivo`} type="button">🔗 Compartir</button>
+                <a href={`/partido/${matchSlug}/`} class="view-btn">▶ Ver Partido</a>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .webmaster-hero {
+    text-align: center;
+    padding: 48px 16px 32px;
+    background: linear-gradient(135deg, #111 0%, #1a0000 100%);
+    border-bottom: 2px solid #E8001D;
+  }
+  .webmaster-hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    color: #fff;
+    letter-spacing: 2px;
+  }
+  .webmaster-hero p {
+    color: #999;
+    margin-top: 12px;
+    max-width: 600px;
+    margin-inline: auto;
+    font-size: 15px;
+  }
+
+  .webmaster-api {
+    max-width: 900px;
+    margin: 32px auto;
+    padding: 0 16px;
+  }
+  .webmaster-api h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #fff;
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .webmaster-api p { color: #999; margin-bottom: 12px; }
+  .api-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .api-box code {
+    flex: 1;
+    color: #E8001D;
+    font-size: 14px;
+    word-break: break-all;
+  }
+
+  .webmaster-matches {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 16px;
+  }
+  .webmaster-matches h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #fff;
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .embed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 24px;
+  }
+
+  .embed-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .embed-card-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #666;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .embed-league { color: #E8001D; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .embed-teams {
+    padding: 12px 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .embed-preview {
+    aspect-ratio: 16/9;
+    background: #000;
+    position: relative;
+  }
+  .embed-preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .embed-actions { padding: 12px 16px; }
+  .embed-code-box { margin-bottom: 10px; }
+  .embed-textarea {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 6px;
+    color: #888;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 8px;
+    resize: none;
+  }
+  .embed-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .copy-btn, .share-btn, .view-btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+  .copy-btn {
+    background: #E8001D;
+    color: #fff;
+  }
+  .copy-btn:hover { background: #c70018; }
+  .share-btn {
+    background: #222;
+    color: #fff;
+  }
+  .share-btn:hover { background: #333; }
+  .view-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #ccc;
+  }
+  .view-btn:hover { border-color: #E8001D; color: #E8001D; }
+
+  @media (max-width: 480px) {
+    .embed-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  // Copy functionality
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var text = btn.getAttribute('data-copy') || '';
+      if (!text) {
+        var card = btn.closest('.embed-card');
+        if (card) {
+          var ta = card.querySelector('.embed-textarea');
+          if (ta) text = ta.value;
+        }
+      }
+      if (text) {
+        navigator.clipboard.writeText(text).then(function() {
+          var orig = btn.textContent;
+          btn.textContent = '✅ Copiado!';
+          setTimeout(function() { btn.textContent = orig; }, 2000);
+        });
+      }
+    });
+  });
+
+  // Share functionality
+  document.querySelectorAll('.share-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var url = btn.getAttribute('data-url');
+      var text = btn.getAttribute('data-text');
+      if (navigator.share) {
+        navigator.share({ title: text, url: url });
+      } else {
+        navigator.clipboard.writeText(url).then(function() {
+          btn.textContent = '✅ URL Copiado!';
+          setTimeout(function() { btn.textContent = '🔗 Compartir'; }, 2000);
+        });
+      }
+    });
+  });
+</script>

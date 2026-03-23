@@ -1,0 +1,85 @@
+---
+import matchDataRaw from '../../data/matches.json';
+
+const allEvents = matchDataRaw.events || [];
+
+function toSlug(event: any) {
+  const desc = `${event.league} ${event.teams}`
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+export function getStaticPaths() {
+  const events = matchDataRaw.events || [];
+  return events.map((event: any) => {
+    return { params: { id: String(event.id) }, props: { event } };
+  });
+}
+
+const { event } = Astro.props;
+const primaryChannel = event.channels?.[0];
+const embedUrl = primaryChannel?.url || '';
+const matchTitle = event.teams || 'Partido en Vivo';
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{matchTitle} - Rojadirecta en Vivo</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+    .embed-wrap { width: 100%; height: 100%; position: relative; }
+    .embed-wrap iframe { width: 100%; height: 100%; border: none; }
+    .branding {
+      position: absolute; top: 8px; right: 8px; z-index: 10;
+      background: rgba(0,0,0,0.7); border-radius: 4px; padding: 3px 8px;
+      font-size: 10px; color: #fff; text-decoration: none; opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .branding:hover { opacity: 1; }
+    .branding span { color: #E8001D; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="embed-wrap">
+    <a class="branding" href="https://rojadirectaenvivo.top/" target="_blank" rel="noopener">
+      <span>ROJA</span>DIRECTAENVIVO
+    </a>
+    <div id="player-frame" data-src={embedUrl} data-title={matchTitle}></div>
+  </div>
+
+  <!-- Popup ad (2x impression) -->
+  <script src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+  <script is:inline>
+    (function(){
+      var _k=['player-frame','dataset','createElement','iframe','setAttribute',
+        'width','100%','height','scrolling','no','loading','lazy',
+        'referrerpolicy','strict-origin-when-cross-origin','allow',
+        'autoplay; fullscreen; encrypted-media; picture-in-picture',
+        'src','title','appendChild','sandbox','allow-same-origin allow-scripts allow-presentation',
+        'style','border:none;width:100%;height:100%'];
+      var c=document.getElementById(_k[0]);
+      if(c){
+        var f=document[_k[2]](_k[3]);
+        f[_k[4]](_k[5],_k[6]);f[_k[4]](_k[7],_k[6]);
+        f[_k[4]](_k[8],_k[9]);f[_k[4]](_k[10],_k[11]);
+        f[_k[4]](_k[12],_k[13]);f[_k[4]](_k[14],_k[15]);
+        f[_k[4]](_k[16],c[_k[1]].src);f[_k[4]](_k[17],c[_k[1]].title);
+        f[_k[4]](_k[19],_k[20]);f[_k[4]](_k[21],_k[22]);
+        c[_k[18]](f);
+      }
+      // Second popup trigger on user interaction
+      var _t=false;
+      document.addEventListener('click',function(){
+        if(!_t){_t=true;var s=document.createElement('script');
+        s.src='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
+        document.body.appendChild(s);}
+      },{once:false});
+    })();
+  </script>
+</body>
+</html>
