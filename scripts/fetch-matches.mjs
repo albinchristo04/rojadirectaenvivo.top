@@ -11,21 +11,35 @@ async function main() {
 
   mkdirSync('./src/data', { recursive: true });
 
+  // Provider IDs for cartelive player (multiple mirrors)
+  const PROVIDERS = [1, 2, 3, 4];
+
   // Transform events into our normalized format
-  const events = (raw.events || []).map((ev, index) => ({
-    id: index + 1,
-    league: ev.league || '',
-    teams: ev.teams || '',
-    time: ev.time || '',
-    date: ev.date || '',
-    datetime: ev.datetime || '',
-    channels: (ev.channels || []).map(ch => ({
-      id: ch.id,
-      lang: ch.lang || 'es',
-      name: `CH${ch.id}`,
-      url: `https://cartelive.club/player/${ch.id}/1`,
-    })),
-  }));
+  // URL format: /player/{providerId}/{channelId}
+  const events = (raw.events || []).map((ev, index) => {
+    const channels = [];
+    for (const ch of (ev.channels || [])) {
+      for (const providerId of PROVIDERS) {
+        channels.push({
+          id: `${ch.id}_p${providerId}`,
+          channelId: ch.id,
+          providerId,
+          lang: ch.lang || 'es',
+          name: providerId === 1 ? `CH${ch.id}` : `CH${ch.id} P${providerId}`,
+          url: `https://cartelive.club/player/${providerId}/${ch.id}`,
+        });
+      }
+    }
+    return {
+      id: index + 1,
+      league: ev.league || '',
+      teams: ev.teams || '',
+      time: ev.time || '',
+      date: ev.date || '',
+      datetime: ev.datetime || '',
+      channels,
+    };
+  });
 
   // Extract player_streams for global players
   const playerStreams = raw.player_streams || {};

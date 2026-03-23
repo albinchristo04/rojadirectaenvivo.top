@@ -24,12 +24,17 @@ const primaryChannel = hasChannels ? channels[0] : null;
           id="match-iframe"
           src={primaryChannel.url}
           title={`Ver ${matchTitle} en vivo`}
-          allowfullscreen
           scrolling="no"
           loading="lazy"
-          allow="autoplay; encrypted-media; fullscreen"
+          referrerpolicy="strict-origin-when-cross-origin"
+          sandbox="allow-same-origin allow-scripts allow-presentation"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
         ></iframe>
       </div>
+      <p class="vpn-hint">
+        🔒 Si no puedes ver el streaming, usa una VPN gratuita.
+        <a href="https://1.1.1.1/" target="_blank" rel="noopener">Descargar 1.1.1.1 (WARP VPN gratis)</a>
+      </p>
     </div>
   )}
 
