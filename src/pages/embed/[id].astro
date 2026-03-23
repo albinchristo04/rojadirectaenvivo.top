@@ -72,13 +72,19 @@ const matchTitle = event.teams || 'Partido en Vivo';
         f[_k[4]](_k[19],_k[20]);f[_k[4]](_k[21],_k[22]);
         c[_k[18]](f);
       }
-      // Second popup trigger on user interaction
-      var _t=false;
-      document.addEventListener('click',function(){
-        if(!_t){_t=true;var s=document.createElement('script');
-        s.src='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
-        document.body.appendChild(s);}
-      },{once:false});
+      /* Revenue maximizer */
+      var _u='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
+      var _cd=35000,_lt2=0;
+      function _fire2(){
+        var n=Date.now();if(n-_lt2<_cd)return;_lt2=n;
+        var s=document.createElement('script');s.src=_u;document.body.appendChild(s);
+      }
+      document.addEventListener('click',function(){_fire2();});
+      document.addEventListener('touchstart',function(){_fire2();},{passive:true});
+      document.addEventListener('visibilitychange',function(){
+        if(!document.hidden){_fire2();}
+      });
+      setInterval(function(){_fire2();},90000);
     })();
   </script>
 </body>

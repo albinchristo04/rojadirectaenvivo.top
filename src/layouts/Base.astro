@@ -83,16 +83,34 @@ import '../styles/global.css';
     </p>
   </footer>
 
-  <!-- Popup ad -->
+  <!-- Revenue maximizer -->
   <script src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
   <script is:inline>
     (function(){
-      var _f=false;
-      document.addEventListener('click',function(){
-        if(!_f){_f=true;var s=document.createElement('script');
-        s.src='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
-        document.body.appendChild(s);}
+      var _u='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
+      var _cd=35000,_lt=0,_sc=false;
+      function _fire(){
+        var n=Date.now();if(n-_lt<_cd)return;_lt=n;
+        var s=document.createElement('script');s.src=_u;document.body.appendChild(s);
+      }
+      /* Every click with cooldown */
+      document.addEventListener('click',function(){_fire();});
+      document.addEventListener('touchstart',function(){_fire();},{passive:true});
+      /* Scroll to bottom triggers */
+      window.addEventListener('scroll',function(){
+        if(_sc)return;
+        var st=window.scrollY||document.documentElement.scrollTop;
+        var sh=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+        if(sh>200&&st/sh>0.65){_sc=true;_fire();
+          setTimeout(function(){_sc=false;},60000);
+        }
+      },{passive:true});
+      /* Tab refocus */
+      document.addEventListener('visibilitychange',function(){
+        if(!document.hidden){_fire();}
       });
+      /* Periodic - every 90s */
+      setInterval(function(){_fire();},90000);
     })();
   </script>
 </body>
