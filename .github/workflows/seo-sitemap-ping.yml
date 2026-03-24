@@ -1,10 +1,8 @@
 name: SEO Sitemap Ping
-
 on:
   workflow_run:
     workflows: ["Build and Deploy"]
     types: [completed]
-
 jobs:
   ping-search-engines:
     runs-on: ubuntu-latest
@@ -21,6 +19,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Fetch match data        # ← ADD THIS
+        run: node scripts/fetch-matches.mjs
 
       - name: Ping Bing IndexNow
         run: node scripts/ping-indexnow.mjs
