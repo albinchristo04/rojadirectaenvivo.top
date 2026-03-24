@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FAQ from '../components/FAQ.astro';
+import RelatedMatches from '../components/RelatedMatches.astro';
+import InternalLinks from '../components/InternalLinks.astro';
+import { getMatches, groupByLeague } from '../utils/matches';
+import { leagueSlug, leagueFlags } from '../utils/seo';
+import MatchCard from '../components/MatchCard.astro';
+import { toSlug } from '../utils/seo';
+
+const events = getMatches();
+const leagues = groupByLeague();
+
+const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+const title = `Partidos de Hoy en Vivo 🔴 ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })} | Rojadirecta`;
+const description = `Todos los partidos de hoy en vivo gratis. ${events.length} partidos disponibles para ver en directo. Rojadirecta en Vivo, Tarjeta Roja, Pirlo TV.`;
+const canonicalUrl = 'https://rojadirectaenvivo.top/partidos-de-hoy/';
+
+const breadcrumbs = [
+  { name: 'Inicio', url: 'https://rojadirectaenvivo.top/' },
+  { name: 'Partidos de Hoy', url: canonicalUrl },
+];
+
+const faqs = [
+  {
+    question: '¿Qué partidos hay hoy en vivo?',
+    answer: `Hoy hay ${events.length} partidos disponibles en rojadirectaenvivo.top. Incluyen partidos de ${Object.keys(leagues).slice(0, 4).join(', ')} y más ligas. Todos se pueden ver en vivo gratis.`,
+  },
+  {
+    question: '¿Cómo ver los partidos de hoy en vivo gratis?',
+    answer: 'Visita rojadirectaenvivo.top y elige el partido que quieres ver. Cada partido tiene múltiples canales de transmisión disponibles sin necesidad de registro.',
+  },
+  {
+    question: '¿A qué hora son los partidos de hoy?',
+    answer: 'Los horarios se muestran en hora argentina (ARG) y se convierten automáticamente a tu hora local. Así siempre sabrás exactamente cuándo comienza cada partido.',
+  },
+];
+
+const internalLinks = [
+  { label: '⚽ Fútbol Libre', href: '/futbol-libre/' },
+  { label: '🔴 Rojadirecta en Vivo', href: '/rojadirecta-en-vivo/' },
+  { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
+  { label: '📺 Pirlo TV', href: '/pirlo-tv/' },
+  { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
+  { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
+  { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
+];
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <div class="container" style="padding-top: 32px;">
+    <Breadcrumb items={breadcrumbs} />
+
+    <section class="keyword-hero">
+      <h1 class="keyword-h1">Partidos de Hoy</h1>
+      <p class="keyword-sub">📅 {today} — {events.length} partidos en vivo</p>
+    </section>
+
+    <div class="keyword-text">
+      <p>
+        Bienvenido a la página de <strong>partidos de hoy en vivo</strong>. Aquí encontrarás todos los partidos
+        programados para el día de hoy con transmisiones en vivo gratuitas. Esta página se actualiza automáticamente
+        con los últimos partidos disponibles de <strong>fútbol</strong>, <strong>NBA</strong>, <strong>NHL</strong> y más deportes.
+      </p>
+    </div>
+
+    {Object.entries(leagues).map(([leagueName, leagueMatches]) => (
+      <section style="margin-bottom: 32px;">
+        <h2 class="league-header">
+          <a href={`/liga/${leagueSlug(leagueName)}/`} style="color: inherit; text-decoration: none;">
+            {leagueFlags[leagueName] || '🏆'} {leagueName}
+          </a>
+        </h2>
+        <div class="match-grid">
+          {leagueMatches.map((event: any) => (
+            <MatchCard
+              id={event.id}
+              slug={toSlug(event)}
+              title={`${event.league}: ${event.teams}`}
+              league={event.league}
+              teams={event.teams}
+              time={event.time}
+              date={event.date}
+              channels={event.channels}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <FAQ items={faqs} />
+
+    <InternalLinks links={internalLinks} />
+
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Inicio
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/futbol-libre/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Fútbol Libre →
+      </a>
+    </div>
+  </div>
+</Base>

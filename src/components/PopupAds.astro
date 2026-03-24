@@ -1,0 +1,60 @@
+<!-- PopupAds.astro — Session-limited popup ad system (max 2 per session) -->
+<script is:inline>
+(function(){
+  var AD_URL = 'https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
+
+  function loadPopupAd() {
+    var s = document.createElement('script');
+    s.src = AD_URL;
+    document.head.appendChild(s);
+  }
+
+  function getCount() {
+    return parseInt(sessionStorage.getItem('popup_count') || '0');
+  }
+
+  function setCount(n) {
+    sessionStorage.setItem('popup_count', String(n));
+  }
+
+  function initPopups() {
+    var popupCount = getCount();
+    if (popupCount >= 2) return;
+
+    // First popup — on page load after 2 seconds
+    if (popupCount === 0) {
+      setTimeout(function() {
+        loadPopupAd();
+        setCount(1);
+
+        // Second popup — 60 seconds after first
+        setTimeout(function() {
+          if (getCount() < 2) {
+            loadPopupAd();
+            setCount(2);
+          }
+        }, 60000);
+      }, 2000);
+    }
+
+    // If user navigates to new page and count is 1, fire second popup
+    if (popupCount === 1) {
+      setTimeout(function() {
+        loadPopupAd();
+        setCount(2);
+      }, 5000);
+    }
+  }
+
+  // Fire second popup on first user click if not yet fired twice
+  document.addEventListener('click', function onFirstClick() {
+    if (getCount() === 1) {
+      loadPopupAd();
+      setCount(2);
+      document.removeEventListener('click', onFirstClick);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', initPopups);
+})();
+</script>

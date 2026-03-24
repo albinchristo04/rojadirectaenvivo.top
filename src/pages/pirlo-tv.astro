@@ -1,25 +1,52 @@
 ---
 import Base from '../layouts/Base.astro';
-import MatchCard from '../components/MatchCard.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FAQ from '../components/FAQ.astro';
+import RelatedMatches from '../components/RelatedMatches.astro';
+import InternalLinks from '../components/InternalLinks.astro';
+import { getMatches } from '../utils/matches';
 
-import matchDataRaw from '../data/matches.json';
-
-const events = matchDataRaw.events || [];
-
-function toSlug(event: any) {
-  const desc = `${event.league} ${event.teams}`
-    .toLowerCase().trim().replace(/\s+/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-  return `${event.id}-${desc}`;
-}
+const events = getMatches();
 
 const title = 'Pirlo TV en Vivo – Fútbol Online Gratis | Rojadirecta Tarjeta Roja';
 const description = 'Pirlo TV en vivo para ver fútbol online gratis. Todos los partidos del día en directo - Rojadirecta, Tarjeta Roja, roja directa.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/pirlo-tv/';
+
+const breadcrumbs = [
+  { name: 'Inicio', url: 'https://rojadirectaenvivo.top/' },
+  { name: 'Pirlo TV', url: canonicalUrl },
+];
+
+const faqs = [
+  {
+    question: '¿Qué es Pirlo TV?',
+    answer: 'Pirlo TV es una plataforma popular para ver fútbol en vivo gratis. En rojadirectaenvivo.top ofrecemos la misma experiencia con transmisiones actualizadas y múltiples canales por partido.',
+  },
+  {
+    question: '¿Pirlo TV sigue funcionando?',
+    answer: 'El sitio original de Pirlo TV ha cambiado varias veces. En rojadirectaenvivo.top mantenemos la experiencia de PirloTV con una plataforma estable y actualizada.',
+  },
+  {
+    question: '¿Pirlo TV es seguro?',
+    answer: 'rojadirectaenvivo.top es seguro para navegar. Nuestra plataforma no requiere descargas ni registros para ver los partidos en vivo.',
+  },
+];
+
+const internalLinks = [
+  { label: '⚽ Fútbol Libre', href: '/futbol-libre/' },
+  { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
+  { label: '🔴 Rojadirecta en Vivo', href: '/rojadirecta-en-vivo/' },
+  { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
+  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
+  { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
+  { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
+];
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl}>
-  <div class="container">
+  <div class="container" style="padding-top: 32px;">
+    <Breadcrumb items={breadcrumbs} />
+
     <section class="keyword-hero">
       <h1 class="keyword-h1">Pirlo TV</h1>
       <p class="keyword-sub">Rojadirecta en vivo gratis — fútbol online sin registro</p>
@@ -56,28 +83,20 @@ const canonicalUrl = 'https://rojadirectaenvivo.top/pirlo-tv/';
       </p>
     </div>
 
-    <h2 class="keyword-text-title">Partidos de Hoy</h2>
+    <RelatedMatches matches={events} title="Partidos de Hoy" />
 
-    {events.length > 0 ? (
-      <div class="match-grid">
-        {events.map((event: any) => {
-          const slug = toSlug(event);
-          return (
-            <MatchCard
-              id={event.id}
-              slug={slug}
-              title={`${event.league}: ${event.teams}`}
-              league={event.league}
-              teams={event.teams}
-              time={event.time}
-              date={event.date}
-              channels={event.channels}
-            />
-          );
-        })}
-      </div>
-    ) : (
-      <p style="color: var(--c-text-secondary);">No hay partidos disponibles en este momento.</p>
-    )}
+    <FAQ items={faqs} />
+
+    <InternalLinks links={internalLinks} />
+
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Ver todos los partidos
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/tarjeta-roja/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Tarjeta Roja →
+      </a>
+    </div>
   </div>
 </Base>

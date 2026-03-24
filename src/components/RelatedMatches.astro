@@ -1,0 +1,34 @@
+---
+import MatchCard from './MatchCard.astro';
+import { toSlug } from '../utils/seo';
+import type { MatchEvent } from '../utils/seo';
+
+export interface Props {
+  matches: MatchEvent[];
+  title?: string;
+}
+
+const { matches, title = 'Partidos Disponibles' } = Astro.props;
+---
+
+{matches.length > 0 ? (
+  <>
+    <h2 class="keyword-text-title">{title}</h2>
+    <div class="match-grid">
+      {matches.map((event) => (
+        <MatchCard
+          id={event.id}
+          slug={toSlug(event)}
+          title={`${event.league}: ${event.teams}`}
+          league={event.league}
+          teams={event.teams}
+          time={event.time}
+          date={event.date}
+          channels={event.channels}
+        />
+      ))}
+    </div>
+  </>
+) : (
+  <p style="color: var(--c-text-secondary);">No hay partidos disponibles en este momento.</p>
+)}

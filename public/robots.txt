@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /embed/
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: msnbot
+Allow: /
+Crawl-delay: 1
 
 Sitemap: https://rojadirectaenvivo.top/sitemap-index.xml

@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FAQ from '../components/FAQ.astro';
+import RelatedMatches from '../components/RelatedMatches.astro';
+import InternalLinks from '../components/InternalLinks.astro';
+import { getMatches } from '../utils/matches';
+
+const events = getMatches();
+
+const title = 'Ver Fútbol Online Gratis – Partidos en Vivo Hoy | Rojadirecta';
+const description = 'Ver fútbol online gratis hoy. Todos los partidos en vivo sin registro. Rojadirecta, Tarjeta Roja, Pirlo TV y Fútbol Libre en un solo lugar.';
+const canonicalUrl = 'https://rojadirectaenvivo.top/ver-futbol/';
+
+const breadcrumbs = [
+  { name: 'Inicio', url: 'https://rojadirectaenvivo.top/' },
+  { name: 'Ver Fútbol Online', url: canonicalUrl },
+];
+
+const faqs = [
+  {
+    question: '¿Cómo ver fútbol gratis en internet?',
+    answer: 'Visita rojadirectaenvivo.top para ver fútbol gratis en internet. Ofrecemos transmisiones en vivo de todas las ligas del mundo sin necesidad de registro ni suscripción.',
+  },
+  {
+    question: '¿Qué necesito para ver fútbol online?',
+    answer: 'Solo necesitas un dispositivo con conexión a internet (celular, tablet o computadora) y un navegador web. No hace falta descargar apps ni registrarse.',
+  },
+  {
+    question: '¿Se puede ver fútbol online desde España/Argentina/México?',
+    answer: 'Sí, rojadirectaenvivo.top funciona en todo el mundo. No importa desde qué país accedas, podrás ver todos los partidos disponibles sin restricciones geográficas.',
+  },
+];
+
+const internalLinks = [
+  { label: '⚽ Fútbol Libre', href: '/futbol-libre/' },
+  { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
+  { label: '🔴 Rojadirecta en Vivo', href: '/rojadirecta-en-vivo/' },
+  { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
+  { label: '📺 Pirlo TV', href: '/pirlo-tv/' },
+  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
+  { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
+];
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <div class="container" style="padding-top: 32px;">
+    <Breadcrumb items={breadcrumbs} />
+
+    <section class="keyword-hero">
+      <h1 class="keyword-h1">Ver Fútbol Online Gratis</h1>
+      <p class="keyword-sub">Partidos en vivo gratis — fútbol en directo sin descargas</p>
+    </section>
+
+    <div class="keyword-text">
+      <p>
+        <strong>Ver fútbol online gratis</strong> nunca fue tan sencillo. En <strong>rojadirectaenvivo.top</strong>
+        reunimos todas las transmisiones disponibles para que puedas disfrutar de los partidos del día desde
+        cualquier dispositivo. Sin descargas, sin registro, solo fútbol puro.
+      </p>
+
+      <p>
+        Si buscas una forma confiable de <strong>ver fútbol gratis</strong>, estás en el lugar correcto.
+        Nuestra plataforma es la evolución de sitios como <strong>Rojadirecta</strong>, <strong>Tarjeta Roja</strong>,
+        <strong>Pirlo TV</strong> y <strong>Fútbol Libre</strong>. Combinamos lo mejor de todos en una
+        interfaz moderna y rápida.
+      </p>
+
+      <p>
+        Cada partido tiene múltiples canales de transmisión para que siempre encuentres una opción que funcione.
+        Cubrimos LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Liga MX, Liga Profesional Argentina,
+        Copa Libertadores, Champions League, NBA y muchas más.
+      </p>
+
+      <p>
+        <strong>Ver fútbol online</strong> en rojadirectaenvivo.top es compatible con celulares, tablets
+        y computadoras. No importa si estás en casa o en movimiento, siempre tendrás acceso a los
+        mejores partidos de <strong>fútbol en vivo gratis</strong>.
+      </p>
+    </div>
+
+    <RelatedMatches matches={events} title="Ver Fútbol Online — Partidos de Hoy" />
+
+    <FAQ items={faqs} />
+
+    <InternalLinks links={internalLinks} />
+
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Ver todos los partidos
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/futbol-libre/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Fútbol Libre →
+      </a>
+    </div>
+  </div>
+</Base>

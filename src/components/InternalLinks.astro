@@ -1,0 +1,21 @@
+---
+export interface Props {
+  links: { label: string; href: string }[];
+  title?: string;
+}
+
+const { links, title = 'Páginas Relacionadas' } = Astro.props;
+---
+
+{links.length > 0 && (
+  <section class="seo-text" style="margin-top: 24px;">
+    <h3>{title}</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+      {links.map(link => (
+        <a href={link.href} class="channel-badge" style="text-decoration: none;">
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </section>
+)}

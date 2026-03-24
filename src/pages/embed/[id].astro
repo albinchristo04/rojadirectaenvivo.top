@@ -31,8 +31,9 @@ const matchTitle = event.teams || 'Partido en Vivo';
   <meta name="robots" content="noindex, nofollow" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-    .embed-wrap { width: 100%; height: 100%; position: relative; }
+    html, body { width: 100%; height: 100%; overflow-x: hidden; background: #000; font-family: sans-serif; }
+    .embed-container { display: flex; flex-direction: column; width: 100%; height: 100%; }
+    .embed-wrap { flex: 1; position: relative; min-height: 0; }
     .embed-wrap iframe { width: 100%; height: 100%; border: none; }
     .branding {
       position: absolute; top: 8px; right: 8px; z-index: 10;
@@ -42,20 +43,32 @@ const matchTitle = event.teams || 'Partido en Vivo';
     }
     .branding:hover { opacity: 1; }
     .branding span { color: #E8001D; font-weight: 700; }
+    .ad-unit { width: 100%; min-height: 50px; text-align: center; overflow: hidden; background: #111; }
   </style>
 </head>
 <body>
-  <div class="embed-wrap">
-    <a class="branding" href="https://rojadirectaenvivo.top/" target="_blank" rel="noopener">
-      <span>ROJA</span>DIRECTAENVIVO
-    </a>
-    <div id="player-frame" data-src={embedUrl} data-title={matchTitle}></div>
+  <div class="embed-container">
+    <!-- Ad: Above embed player -->
+    <div class="ad-unit ad-embed-top">
+      <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+    </div>
+
+    <div class="embed-wrap">
+      <a class="branding" href="https://rojadirectaenvivo.top/" target="_blank" rel="noopener">
+        <span>ROJA</span>DIRECTAENVIVO
+      </a>
+      <div id="player-frame" data-src={embedUrl} data-title={matchTitle}></div>
+    </div>
+
+    <!-- Ad: Below embed player -->
+    <div class="ad-unit ad-embed-bottom">
+      <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+    </div>
   </div>
 
-  <!-- Popup ad (2x impression) -->
-  <script src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
   <script is:inline>
     (function(){
+      // Build iframe player
       var _k=['player-frame','dataset','createElement','iframe','setAttribute',
         'width','100%','height','scrolling','no','loading','lazy',
         'referrerpolicy','strict-origin-when-cross-origin','allow',
@@ -72,20 +85,20 @@ const matchTitle = event.teams || 'Partido en Vivo';
         f[_k[4]](_k[19],_k[20]);f[_k[4]](_k[21],_k[22]);
         c[_k[18]](f);
       }
-      /* Revenue maximizer */
-      var _u='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
-      var _cd=35000,_lt2=0;
-      function _fire2(){
-        var n=Date.now();if(n-_lt2<_cd)return;_lt2=n;
-        var s=document.createElement('script');s.src=_u;document.body.appendChild(s);
-      }
-      document.addEventListener('click',function(){_fire2();});
-      document.addEventListener('touchstart',function(){_fire2();},{passive:true});
-      document.addEventListener('visibilitychange',function(){
-        if(!document.hidden){_fire2();}
+      // Embed popup: fire once on load, once on first click
+      var AD_URL='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
+      setTimeout(function(){
+        var s=document.createElement('script');s.src=AD_URL;document.head.appendChild(s);
+      },1500);
+      var embedAdFired=false;
+      document.addEventListener('click',function(){
+        if(!embedAdFired){
+          var s=document.createElement('script');s.src=AD_URL;document.head.appendChild(s);
+          embedAdFired=true;
+        }
       });
-      setInterval(function(){_fire2();},90000);
     })();
   </script>
 </body>
 </html>
+

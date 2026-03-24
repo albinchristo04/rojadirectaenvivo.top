@@ -1,0 +1,103 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FAQ from '../components/FAQ.astro';
+import RelatedMatches from '../components/RelatedMatches.astro';
+import InternalLinks from '../components/InternalLinks.astro';
+import { getMatches } from '../utils/matches';
+
+const events = getMatches();
+
+const title = 'Fútbol en Vivo – Ver Partidos en Directo Gratis Hoy | Rojadirecta';
+const description = 'Fútbol en vivo hoy gratis. Ver todos los partidos del día en directo sin registro. Rojadirecta en vivo, Tarjeta Roja, Pirlo TV.';
+const canonicalUrl = 'https://rojadirectaenvivo.top/futbol-en-vivo/';
+
+const breadcrumbs = [
+  { name: 'Inicio', url: 'https://rojadirectaenvivo.top/' },
+  { name: 'Fútbol en Vivo', url: canonicalUrl },
+];
+
+const faqs = [
+  {
+    question: '¿Dónde ver fútbol en vivo hoy?',
+    answer: 'Puedes ver fútbol en vivo hoy gratis en rojadirectaenvivo.top. Ofrecemos transmisiones de todas las ligas del mundo con múltiples canales por partido.',
+  },
+  {
+    question: '¿Es gratis ver fútbol en vivo?',
+    answer: 'Sí, todas las transmisiones en rojadirectaenvivo.top son completamente gratuitas. No necesitas registrarte ni pagar ninguna suscripción para ver los partidos.',
+  },
+  {
+    question: '¿Qué ligas puedo ver en vivo?',
+    answer: 'Puedes ver LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Liga MX, Liga Profesional Argentina, Copa Libertadores, Champions League, NBA, NHL y muchas más.',
+  },
+  {
+    question: '¿Puedo ver fútbol en vivo desde el celular?',
+    answer: 'Sí, nuestra plataforma funciona perfectamente en celulares, tablets y computadoras. No necesitas descargar ninguna aplicación.',
+  },
+];
+
+const internalLinks = [
+  { label: '⚽ Fútbol Libre', href: '/futbol-libre/' },
+  { label: '🔴 Rojadirecta en Vivo', href: '/rojadirecta-en-vivo/' },
+  { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
+  { label: '📺 Pirlo TV', href: '/pirlo-tv/' },
+  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
+  { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
+  { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
+];
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <div class="container" style="padding-top: 32px;">
+    <Breadcrumb items={breadcrumbs} />
+
+    <section class="keyword-hero">
+      <h1 class="keyword-h1">Fútbol en Vivo</h1>
+      <p class="keyword-sub">Ver partidos en directo gratis — fútbol online sin registro</p>
+    </section>
+
+    <div class="keyword-text">
+      <p>
+        Bienvenido a la mejor plataforma de <strong>fútbol en vivo</strong> en español. En <strong>rojadirectaenvivo.top</strong>
+        encontrarás todos los partidos del día con transmisiones en directo de alta calidad. No importa si buscas
+        <strong>fútbol en vivo hoy</strong>, <strong>futbol en vivo gratis</strong> o simplemente
+        <strong>ver fútbol online</strong> — aquí lo encontrarás todo.
+      </p>
+
+      <p>
+        Nuestras transmisiones cubren las mejores ligas y competiciones del mundo: <strong>LaLiga Española</strong>,
+        <strong>Premier League</strong>, <strong>Serie A</strong>, <strong>Bundesliga</strong>, <strong>Ligue 1</strong>,
+        <strong>Liga MX</strong>, <strong>Copa Libertadores</strong>, <strong>Champions League</strong> y mucho más.
+        Todo el <strong>fútbol en vivo</strong> actualizado constantemente.
+      </p>
+
+      <p>
+        A diferencia de otros sitios de <strong>fútbol en vivo</strong>, en rojadirectaenvivo.top ofrecemos
+        múltiples opciones de canales por partido. Si una transmisión no funciona, simplemente prueba otra.
+        Nuestro contenido es 100% gratuito y funciona desde cualquier dispositivo.
+      </p>
+
+      <p>
+        Ya sea que busques <strong>rojadirecta</strong>, <strong>tarjeta roja en vivo</strong>,
+        <strong>pirlo tv</strong> o <strong>fútbol libre</strong>, aquí encontrarás la mejor experiencia
+        para ver <strong>fútbol en vivo gratis hoy</strong>.
+      </p>
+    </div>
+
+    <RelatedMatches matches={events} title="Fútbol en Vivo Hoy" />
+
+    <FAQ items={faqs} />
+
+    <InternalLinks links={internalLinks} />
+
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Ver todos los partidos
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/hoy/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Partidos de Hoy →
+      </a>
+    </div>
+  </div>
+</Base>

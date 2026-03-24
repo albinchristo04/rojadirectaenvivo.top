@@ -1,0 +1,25 @@
+---
+export interface Props {
+  items: { name: string; url: string }[];
+}
+
+const { items } = Astro.props;
+
+import { buildBreadcrumbSchema } from '../utils/seo';
+const schema = buildBreadcrumbSchema(items);
+---
+
+<nav class="match-breadcrumb" aria-label="Breadcrumb">
+  {items.map((item, i) => (
+    <>
+      {i > 0 && <span>›</span>}
+      {i < items.length - 1 ? (
+        <a href={item.url}>{item.name}</a>
+      ) : (
+        <span>{item.name}</span>
+      )}
+    </>
+  ))}
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

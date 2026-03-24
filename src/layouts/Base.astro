@@ -1,12 +1,16 @@
 ---
+import PopupAds from '../components/PopupAds.astro';
+
 export interface Props {
   title: string;
   description: string;
   canonicalUrl: string;
   matchSchema?: object;
+  ogImage?: string;
 }
 
-const { title, description, canonicalUrl, matchSchema } = Astro.props;
+const { title, description, canonicalUrl, matchSchema, ogImage } = Astro.props;
+const resolvedOgImage = ogImage || 'https://rojadirectaenvivo.top/og-default.png';
 
 import '../styles/global.css';
 ---
@@ -23,6 +27,11 @@ import '../styles/global.css';
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:image" content={resolvedOgImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={resolvedOgImage} />
   <meta name="theme-color" content="#E8001D" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,6 +39,15 @@ import '../styles/global.css';
   {matchSchema && (
     <script type="application/ld+json" set:html={JSON.stringify(matchSchema)} />
   )}
+  <slot name="head" />
+  <!-- Clarity tracking code for https://rojadirectaenvivo.top/ -->
+  <script is:inline>
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w0lrniwx5e");
+  </script>
 </head>
 <body>
   <!-- Header -->
@@ -40,10 +58,12 @@ import '../styles/global.css';
       <!-- Desktop nav -->
       <ul class="nav-desktop">
         <li><a href="/">Inicio</a></li>
-        <li><a href="/rojadirecta-en-vivo/">Rojadirecta en Vivo</a></li>
+        <li><a href="/hoy/">Hoy</a></li>
+        <li><a href="/futbol-libre/">Fútbol Libre</a></li>
+        <li><a href="/futbol-en-vivo/">Fútbol en Vivo</a></li>
+        <li><a href="/rojadirecta-en-vivo/">Rojadirecta</a></li>
         <li><a href="/tarjeta-roja/">Tarjeta Roja</a></li>
         <li><a href="/pirlo-tv/">Pirlo TV</a></li>
-        <li><a href="/webmasters/">Webmasters</a></li>
       </ul>
 
       <!-- Mobile menu (CSS-only) -->
@@ -53,10 +73,12 @@ import '../styles/global.css';
       </label>
       <ul class="nav-mobile">
         <li><a href="/">Inicio</a></li>
-        <li><a href="/rojadirecta-en-vivo/">Rojadirecta en Vivo</a></li>
+        <li><a href="/hoy/">Hoy</a></li>
+        <li><a href="/futbol-libre/">Fútbol Libre</a></li>
+        <li><a href="/futbol-en-vivo/">Fútbol en Vivo</a></li>
+        <li><a href="/rojadirecta-en-vivo/">Rojadirecta</a></li>
         <li><a href="/tarjeta-roja/">Tarjeta Roja</a></li>
         <li><a href="/pirlo-tv/">Pirlo TV</a></li>
-        <li><a href="/webmasters/">Webmasters</a></li>
       </ul>
     </div>
   </header>
@@ -70,48 +92,25 @@ import '../styles/global.css';
   <footer class="site-footer">
     <div class="footer-logo">ROJA<span>DIRECTAENVIVO</span></div>
     <nav class="footer-nav">
+      <a href="/hoy/">Partidos de Hoy</a>
+      <a href="/futbol-libre/">Fútbol Libre</a>
+      <a href="/futbol-en-vivo/">Fútbol en Vivo</a>
+      <a href="/futbol-en-vivo-gratis/">Fútbol en Vivo Gratis</a>
+      <a href="/ver-futbol/">Ver Fútbol Online</a>
+      <a href="/partidos-de-hoy/">Partidos de Hoy en Vivo</a>
       <a href="/rojadirecta-en-vivo/">Rojadirecta en Vivo</a>
       <a href="/tarjeta-roja/">Tarjeta Roja</a>
       <a href="/pirlo-tv/">Pirlo TV</a>
       <a href="/webmasters/">Webmasters</a>
     </nav>
     <p class="footer-seo">
-      Ver fútbol en vivo gratis — Rojadirecta · Tarjeta Roja TV · Pirlo TV · Roja Directa
+      Ver fútbol en vivo gratis — Fútbol Libre · Rojadirecta · Tarjeta Roja TV · Pirlo TV · Roja Directa · Partidos de Hoy
     </p>
     <p class="footer-disclaimer">
       Este sitio no aloja ningún contenido. Todos los streams son proporcionados por terceros.
     </p>
   </footer>
 
-  <!-- Revenue maximizer -->
-  <script src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-  <script is:inline>
-    (function(){
-      var _u='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
-      var _cd=35000,_lt=0,_sc=false;
-      function _fire(){
-        var n=Date.now();if(n-_lt<_cd)return;_lt=n;
-        var s=document.createElement('script');s.src=_u;document.body.appendChild(s);
-      }
-      /* Every click with cooldown */
-      document.addEventListener('click',function(){_fire();});
-      document.addEventListener('touchstart',function(){_fire();},{passive:true});
-      /* Scroll to bottom triggers */
-      window.addEventListener('scroll',function(){
-        if(_sc)return;
-        var st=window.scrollY||document.documentElement.scrollTop;
-        var sh=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-        if(sh>200&&st/sh>0.65){_sc=true;_fire();
-          setTimeout(function(){_sc=false;},60000);
-        }
-      },{passive:true});
-      /* Tab refocus */
-      document.addEventListener('visibilitychange',function(){
-        if(!document.hidden){_fire();}
-      });
-      /* Periodic - every 90s */
-      setInterval(function(){_fire();},90000);
-    })();
-  </script>
+  <PopupAds />
 </body>
 </html>

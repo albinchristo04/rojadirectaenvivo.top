@@ -8,8 +8,9 @@ if (!KEY) {
   process.exit(0);
 }
 
+// Must match the toSlug in Astro pages (league + teams)
 function toSlug(event) {
-  const desc = (event.attributes?.diary_description || '')
+  const desc = `${event.league} ${event.teams}`
     .toLowerCase()
     .trim()
     .replace(/\s+/g, ' ')
@@ -29,8 +30,8 @@ async function main() {
     process.exit(0);
   }
 
-  // Handle both { data: [...] } and plain array formats
-  const matchList = Array.isArray(matches) ? matches : (matches.data ?? []);
+  // New format: { events: [...], lastUpdated, totalEvents, playerStreams }
+  const matchList = matches.events || [];
 
   if (matchList.length === 0) {
     console.warn('⚠️ No matches found in matches.json. Skipping IndexNow ping.');

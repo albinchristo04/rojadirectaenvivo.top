@@ -52,17 +52,100 @@ const title = rawTitle.length > 70 ? `${event.teams} en Vivo | Rojadirecta`.subs
 const description = `Ver ${event.teams} en vivo gratis. ${event.league} en directo por rojadirecta, tarjeta roja, pirlo tv. Partido en vivo hoy ${event.date}.`;
 const canonicalUrl = `https://rojadirectaenvivo.top/partido/${slug}/`;
 
+// Detect sport from league name for richer schema
+const leagueLower = (event.league || '').toLowerCase();
+function detectSport(league: string): string {
+  if (/nba|basketball|baloncesto/i.test(league)) return 'Basketball';
+  if (/nhl|hockey/i.test(league)) return 'Ice Hockey';
+  if (/nfl|football americano/i.test(league)) return 'American Football';
+  if (/mlb|baseball|béisbol/i.test(league)) return 'Baseball';
+  if (/ufc|mma|boxeo|boxing/i.test(league)) return 'Combat Sport';
+  if (/f1|formula|motogp|nascar/i.test(league)) return 'Motorsport';
+  if (/atp|wta|tennis|tenis/i.test(league)) return 'Tennis';
+  return 'Football';
+}
+const detectedSport = detectSport(event.league);
+
+function leagueSlug(league: string) {
+  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+function teamSlugFn(name: string) {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+const currentLeagueSlug = leagueSlug(event.league);
+const teamASlug = teamSlugFn(teamA);
+const teamBSlug = teamSlugFn(teamB);
+
+// Fresh content date for Bing
+const publishDate = `${isoDate}T${event.time || '00:00'}:00-03:00`;
+
 const sportsEventSchema = {
   "@context": "https://schema.org",
   "@type": "SportsEvent",
   "name": event.teams,
   "description": `Ver ${event.teams} en vivo gratis. ${event.league} en directo.`,
   "startDate": `${isoDate}T${event.time || '00:00'}-03:00`,
-  "sport": "Fútbol",
+  "sport": detectedSport,
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
   "location": { "@type": "VirtualLocation", "url": canonicalUrl },
-  "organizer": { "@type": "Organization", "name": event.league }
+  "organizer": { "@type": "Organization", "name": event.league },
+  "homeTeam": { "@type": "SportsTeam", "name": teamA, "url": `https://rojadirectaenvivo.top/equipo/${teamASlug}/` },
+  "awayTeam": { "@type": "SportsTeam", "name": teamB, "url": `https://rojadirectaenvivo.top/equipo/${teamBSlug}/` }
+};
+
+// BreadcrumbList schema for Bing crawl understanding
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://rojadirectaenvivo.top/" },
+    { "@type": "ListItem", "position": 2, "name": event.league, "item": `https://rojadirectaenvivo.top/liga/${currentLeagueSlug}/` },
+    { "@type": "ListItem", "position": 3, "name": event.teams, "item": canonicalUrl }
+  ]
+};
+
+// FAQ structured data for Bing rich results
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `¿Dónde ver ${event.teams} en vivo?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Puedes ver ${event.teams} en vivo gratis en rojadirectaenvivo.top. Ofrecemos ${event.channels?.length || 0} canales de transmisión para este partido de ${event.league}.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `¿A qué hora juega ${event.teams}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `El partido ${event.teams} se juega el ${event.date} a las ${event.time} hora Argentina. Consulta tu hora local en la página del partido.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `¿En qué canal transmiten ${event.teams}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `El partido ${event.teams} se transmite por ${event.channels?.length || 0} canales disponibles en rojadirectaenvivo.top. Haz clic en cualquier canal para ver la transmisión en vivo.`
+      }
+    }
+  ]
+};
+
+// Speakable schema for Bing Copilot / AI citation
+const speakableSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [".seo-text", ".match-teams-hero", ".faq-section"]
+  },
+  "url": canonicalUrl
 };
 
 const langFlags: Record<string, string> = {
@@ -71,13 +154,16 @@ const langFlags: Record<string, string> = {
 };
 ---
 
-<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={sportsEventSchema}>
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={sportsEventSchema} ogImage="https://rojadirectaenvivo.top/og-default.png">
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
   <!-- Match Header -->
   <section class="match-header">
     <nav class="match-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Inicio</a>
       <span>›</span>
-      <span>{event.league}</span>
+      <a href={`/liga/${currentLeagueSlug}/`}>{event.league}</a>
       <span>›</span>
       <span>{event.teams}</span>
     </nav>
@@ -97,19 +183,32 @@ const langFlags: Record<string, string> = {
     </div>
 
     <div class="match-time-row">
-      <span>📅 {event.date}</span>
+      <span>📅 <time datetime={publishDate}>{event.date}</time></span>
       <span>•</span>
       <span class="time-local">🕐 {event.time} ARG</span>
       <span>•</span>
       <LocalTime hour={event.time} date={isoDate} id={String(event.id)} />
     </div>
+    <p class="match-published" style="color: var(--c-text-muted); font-size: 12px; margin-top: 8px; text-align: center;">
+      Publicado: <time datetime={publishDate}>{event.date} {event.time}</time> · Actualizado cada 3 horas
+    </p>
   </section>
 
   <!-- Two-column layout -->
   <div class="match-layout">
     <div>
+      <!-- Ad: Above video player -->
+      <div class="ad-unit ad-above-player">
+        <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+      </div>
+
       <!-- Player -->
       <MatchPlayer channels={event.channels} matchTitle={event.teams} />
+
+      <!-- Ad: Below video player -->
+      <div class="ad-unit ad-below-player">
+        <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+      </div>
 
       <!-- SEO text -->
       <section class="seo-text">
@@ -127,6 +226,60 @@ const langFlags: Record<string, string> = {
           En <strong>rojadirectaenvivo.top</strong> encontrarás todos los partidos del día en vivo.
         </p>
       </section>
+
+      <!-- Ad: Between match info and FAQ -->
+      <div class="ad-unit ad-mid-content">
+        <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+      </div>
+
+      <!-- FAQ Section -->
+      <section class="seo-text faq-section" style="margin-top: 24px;">
+        <h3>Preguntas Frecuentes</h3>
+        <details style="margin-bottom: 12px;" open>
+          <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+            ¿Dónde ver {event.teams} en vivo?
+          </summary>
+          <p style="margin-top: 8px;">
+            Puedes ver {event.teams} en vivo gratis en rojadirectaenvivo.top.
+            Ofrecemos {event.channels?.length || 0} canales de transmisión para este partido
+            de {event.league}. Haz clic en cualquier canal de la lista para iniciar la transmisión.
+          </p>
+        </details>
+        <details style="margin-bottom: 12px;">
+          <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+            ¿A qué hora juega {event.teams}?
+          </summary>
+          <p style="margin-top: 8px;">
+            El partido {event.teams} se juega el {event.date} a las {event.time} hora Argentina.
+            Consulta la hora local en tu zona en la parte superior de esta página.
+          </p>
+        </details>
+        <details>
+          <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+            ¿En qué canal transmiten {event.teams}?
+          </summary>
+          <p style="margin-top: 8px;">
+            El partido se transmite por {event.channels?.length || 0} canales disponibles
+            en rojadirectaenvivo.top. Todos los canales son gratuitos y no requieren registro.
+          </p>
+        </details>
+      </section>
+
+      <!-- Internal links -->
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px;">
+        <a href={`/liga/${currentLeagueSlug}/`} style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+          🏆 Más partidos de {event.league}
+        </a>
+        <a href={`/equipo/${teamASlug}/`} style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+          ⚽ {teamA}
+        </a>
+        <a href={`/equipo/${teamBSlug}/`} style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+          ⚽ {teamB}
+        </a>
+        <a href="/hoy/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+          📅 Partidos de Hoy
+        </a>
+      </div>
     </div>
 
     <!-- Sidebar -->
@@ -165,6 +318,10 @@ const langFlags: Record<string, string> = {
 
       {relatedMatches.length > 0 && (
         <div style="margin-top:24px;">
+          <!-- Ad: Above related matches -->
+          <div class="ad-unit ad-before-related">
+            <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
+          </div>
           <h3 class="sidebar-title">Ver Más Partidos</h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
             {relatedMatches.map((m: any) => {

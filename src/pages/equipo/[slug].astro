@@ -1,0 +1,223 @@
+---
+import Base from '../../layouts/Base.astro';
+import MatchCard from '../../components/MatchCard.astro';
+import matchDataRaw from '../../data/matches.json';
+
+const allEvents = matchDataRaw.events || [];
+
+function toSlug(event: any) {
+  const desc = `${event.league} ${event.teams}`
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+function teamSlug(name: string) {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+function leagueSlug(league: string) {
+  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+export function getStaticPaths() {
+  const events = matchDataRaw.events || [];
+  const teams: Record<string, { teamName: string; matches: any[] }> = {};
+
+  for (const event of events) {
+    // Split teams by " - " separator
+    const teamNames = (event.teams || '').split(/\s*-\s*/);
+    for (const raw of teamNames) {
+      const name = raw.trim();
+      if (!name) continue;
+      const slug = name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      if (!teams[slug]) teams[slug] = { teamName: name, matches: [] };
+      teams[slug].matches.push(event);
+    }
+  }
+
+  return Object.entries(teams).map(([slug, data]) => ({
+    params: { slug },
+    props: { teamName: data.teamName, matches: data.matches },
+  }));
+}
+
+const { teamName, matches } = Astro.props;
+const slug = teamSlug(teamName);
+
+// Sort by time
+matches.sort((a: any, b: any) => (a.time || '').localeCompare(b.time || ''));
+
+// Unique leagues for this team
+const teamLeagues = [...new Set(matches.map((m: any) => m.league))];
+
+// Detect sport
+function detectSportName(league: string): string {
+  if (/nba|basketball|baloncesto|liga endesa/i.test(league)) return 'baloncesto';
+  if (/nhl|hockey/i.test(league)) return 'hockey sobre hielo';
+  if (/nfl|football americano/i.test(league)) return 'football americano';
+  if (/mlb|baseball|béisbol/i.test(league)) return 'béisbol';
+  return 'fútbol';
+}
+const primaryLeague = teamLeagues[0] || '';
+const sportName = detectSportName(primaryLeague);
+
+// Get other teams for internal linking
+const allTeams = new Set<string>();
+for (const event of allEvents) {
+  const names = (event.teams || '').split(/\s*-\s*/);
+  for (const n of names) {
+    const t = n.trim();
+    if (t && t !== teamName) allTeams.add(t);
+  }
+}
+const otherTeams = [...allTeams].slice(0, 12);
+
+// SEO
+const title = `${teamName} en Vivo 🔴 Ver Partidos Gratis | Rojadirecta`;
+const description = `Ver todos los partidos de ${teamName} en vivo gratis. ${matches.length} partidos disponibles. Transmisión en directo por Rojadirecta en Vivo.`;
+const canonicalUrl = `https://rojadirectaenvivo.top/equipo/${slug}/`;
+
+const teamSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": `${teamName} en Vivo`,
+  "description": description,
+  "url": canonicalUrl,
+  "mainEntity": {
+    "@type": "SportsTeam",
+    "name": teamName,
+    "sport": sportName === 'fútbol' ? 'Soccer' : sportName,
+  }
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://rojadirectaenvivo.top/" },
+    { "@type": "ListItem", "position": 2, "name": teamName, "item": canonicalUrl }
+  ]
+};
+
+const leagueFlags: Record<string, string> = {
+  'Laliga': '🇪🇸', 'Laliga 2': '🇪🇸', 'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Serie A': '🇮🇹', 'Bundesliga': '🇩🇪', 'Ligue 1': '🇫🇷',
+  'Liga Mx': '🇲🇽', 'Torneo LPF': '🇦🇷', 'Copa Libertadores': '🌎',
+  'Champions League': '🇪🇺', 'Liga Betplay Dimayor': '🇨🇴',
+  'Ecuador Ligapro': '🇪🇨', 'NBA': '🏀', 'NHL': '🏒', 'NFL': '🏈', 'MLB': '⚾',
+};
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={teamSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <div class="container" style="padding-top: 32px;">
+    <!-- Breadcrumb -->
+    <nav class="match-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Inicio</a>
+      <span>›</span>
+      <span>{teamName}</span>
+    </nav>
+
+    <h1 class="keyword-h1" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 8px;">
+      ⚽ {teamName} en Vivo
+    </h1>
+    <p class="keyword-sub" style="margin-bottom: 16px;">
+      {matches.length} partidos de {teamName} disponibles — ver en vivo gratis
+    </p>
+
+    <!-- League badges -->
+    {teamLeagues.length > 0 && (
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+        {teamLeagues.map((league: string) => (
+          <a href={`/liga/${leagueSlug(league)}/`} class="channel-badge" style="text-decoration: none;">
+            {leagueFlags[league] || '🏆'} {league}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <!-- Matches Grid -->
+    <div class="match-grid">
+      {matches.map((event: any) => {
+        const matchSlug = toSlug(event);
+        return (
+          <MatchCard
+            id={event.id}
+            slug={matchSlug}
+            title={`${event.league}: ${event.teams}`}
+            league={event.league}
+            teams={event.teams}
+            time={event.time}
+            date={event.date}
+            channels={event.channels}
+          />
+        );
+      })}
+    </div>
+
+    <!-- SEO Text -->
+    <section class="seo-text">
+      <h2>Ver {teamName} en Vivo Gratis</h2>
+      <p>
+        Bienvenido a la página de <strong>{teamName}</strong> en <strong>Rojadirecta en Vivo</strong>.
+        Aquí encontrarás todos los partidos de <strong>{teamName}</strong> transmitidos
+        en vivo y en directo. Similar a <strong>Tarjeta Roja</strong> y <strong>Pirlo TV</strong>,
+        ofrecemos la mejor experiencia para ver {sportName} en vivo gratis.
+      </p>
+      <p>
+        {teamName} compite en {teamLeagues.join(', ')}. Todos los partidos se actualizan
+        automáticamente cada 3 horas. Vuelve a esta página regularmente para ver
+        los próximos partidos de <strong>{teamName}</strong>.
+      </p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="seo-text faq-section" style="margin-top: 24px;">
+      <h3>Preguntas Frecuentes</h3>
+      <details style="margin-bottom: 12px;" open>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿Dónde ver {teamName} en vivo?
+        </summary>
+        <p style="margin-top: 8px;">
+          Puedes ver todos los partidos de {teamName} en vivo gratis en rojadirectaenvivo.top.
+          Ofrecemos múltiples canales de transmisión para cada partido.
+        </p>
+      </details>
+      <details>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿En qué liga juega {teamName}?
+        </summary>
+        <p style="margin-top: 8px;">
+          {teamName} participa en {teamLeagues.join(', ')}. Todos los partidos están disponibles
+          en nuestra plataforma de forma gratuita.
+        </p>
+      </details>
+    </section>
+
+    <!-- Other Teams -->
+    {otherTeams.length > 0 && (
+      <section class="seo-text" style="margin-top: 24px;">
+        <h3>Otros Equipos en Vivo</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+          {otherTeams.map((team: string) => (
+            <a href={`/equipo/${teamSlug(team)}/`} class="channel-badge" style="text-decoration: none;">
+              ⚽ {team}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Navigation -->
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Ver todos los partidos de hoy
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/hoy/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Partidos de Hoy →
+      </a>
+    </div>
+  </div>
+</Base>

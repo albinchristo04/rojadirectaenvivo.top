@@ -1,0 +1,181 @@
+---
+import Base from '../../layouts/Base.astro';
+import MatchCard from '../../components/MatchCard.astro';
+import matchDataRaw from '../../data/matches.json';
+
+const allEvents = matchDataRaw.events || [];
+
+function toSlug(event: any) {
+  const desc = `${event.league} ${event.teams}`
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+function leagueSlug(league: string) {
+  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+export function getStaticPaths() {
+  const events = matchDataRaw.events || [];
+  const leagues: Record<string, any[]> = {};
+  for (const event of events) {
+    const key = event.league || 'Otros';
+    if (!leagues[key]) leagues[key] = [];
+    leagues[key].push(event);
+  }
+  return Object.entries(leagues).map(([leagueName, matches]) => ({
+    params: { slug: leagueName.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') },
+    props: { leagueName, matches },
+  }));
+}
+
+const { leagueName, matches } = Astro.props;
+const slug = leagueSlug(leagueName);
+
+// Sort by time
+matches.sort((a: any, b: any) => (a.time || '').localeCompare(b.time || ''));
+
+// League emoji mapping
+const leagueFlags: Record<string, string> = {
+  'Laliga': '🇪🇸', 'Laliga 2': '🇪🇸', 'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Serie A': '🇮🇹', 'Bundesliga': '🇩🇪', 'Bundesliga 2': '🇩🇪',
+  'Ligue 1': '🇫🇷', 'Ligue 2': '🇫🇷', 'Eredivisie': '🇳🇱',
+  'Liga Mx': '🇲🇽', 'Liga Endesa': '🇪🇸', 'Torneo LPF': '🇦🇷',
+  'Copa Libertadores': '🌎', 'Champions League': '🇪🇺',
+  'Liga AUF Uruguaya': '🇺🇾', 'Liga Betplay Dimayor': '🇨🇴',
+  'Ecuador Ligapro': '🇪🇨', 'Premiership': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'NBA': '🇺🇸', 'NHL': '🇺🇸', 'NFL': '🇺🇸', 'MLB': '🇺🇸',
+};
+const emoji = leagueFlags[leagueName] || '⚽';
+
+// Get other leagues for internal linking
+const otherLeagues = [...new Set(allEvents.map((e: any) => e.league))]
+  .filter(l => l !== leagueName)
+  .slice(0, 8);
+
+// SEO
+const title = `${leagueName} en Vivo 🔴 Ver Partidos Gratis | Rojadirecta`;
+const description = `Ver todos los partidos de ${leagueName} en vivo gratis. Transmisión en directo por Rojadirecta en Vivo, Tarjeta Roja, Pirlo TV. ${matches.length} partidos disponibles hoy.`;
+const canonicalUrl = `https://rojadirectaenvivo.top/liga/${slug}/`;
+
+// Detect sport for league description text
+function detectSportName(league: string): string {
+  if (/nba|basketball|baloncesto|liga endesa/i.test(league)) return 'baloncesto';
+  if (/nhl|hockey/i.test(league)) return 'hockey sobre hielo';
+  if (/nfl|football americano/i.test(league)) return 'football americano';
+  if (/mlb|baseball|béisbol/i.test(league)) return 'béisbol';
+  if (/ufc|mma|boxeo|boxing/i.test(league)) return 'deportes de combate';
+  if (/f1|formula|motogp|nascar/i.test(league)) return 'motorsport';
+  if (/atp|wta|tennis|tenis/i.test(league)) return 'tenis';
+  return 'fútbol';
+}
+const sportName = detectSportName(leagueName);
+
+const leagueSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": `${leagueName} en Vivo`,
+  "description": description,
+  "url": canonicalUrl,
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": matches.length,
+    "itemListElement": matches.map((m: any, i: number) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "url": `https://rojadirectaenvivo.top/partido/${toSlug(m)}/`,
+      "name": m.teams
+    }))
+  }
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://rojadirectaenvivo.top/" },
+    { "@type": "ListItem", "position": 2, "name": leagueName, "item": canonicalUrl }
+  ]
+};
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={leagueSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <div class="container" style="padding-top: 32px;">
+    <!-- Breadcrumb -->
+    <nav class="match-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Inicio</a>
+      <span>›</span>
+      <span>{leagueName}</span>
+    </nav>
+
+    <h1 class="keyword-h1" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 8px;">
+      {emoji} {leagueName} en Vivo
+    </h1>
+    <p class="keyword-sub" style="margin-bottom: 32px;">
+      {matches.length} partidos de {leagueName} disponibles — ver en vivo gratis
+    </p>
+
+    <!-- Matches Grid -->
+    <div class="match-grid">
+      {matches.map((event: any) => {
+        const matchSlug = toSlug(event);
+        return (
+          <MatchCard
+            id={event.id}
+            slug={matchSlug}
+            title={`${event.league}: ${event.teams}`}
+            league={event.league}
+            teams={event.teams}
+            time={event.time}
+            date={event.date}
+            channels={event.channels}
+          />
+        );
+      })}
+    </div>
+
+    <!-- SEO Text -->
+    <section class="seo-text">
+      <h2>Ver {leagueName} en Vivo Gratis</h2>
+      <p>
+        Bienvenido a la página de <strong>{leagueName}</strong> en <strong>Rojadirecta en Vivo</strong>.
+        Aquí encontrarás todos los partidos de {sportName} de <strong>{leagueName}</strong> transmitidos
+        en vivo y en directo. Similar a <strong>Tarjeta Roja</strong> y <strong>Pirlo TV</strong>,
+        ofrecemos la mejor experiencia para ver {sportName} en vivo gratis.
+      </p>
+      <p>
+        Todos los partidos se actualizan automáticamente cada 3 horas. Vuelve a esta página
+        regularmente para ver los próximos partidos de <strong>{leagueName}</strong>.
+        En <strong>rojadirectaenvivo.top</strong> encontrarás las mejores transmisiones de
+        {sportName} en vivo — sin registro, sin pago, completamente gratis.
+      </p>
+    </section>
+
+    <!-- Other Leagues -->
+    {otherLeagues.length > 0 && (
+      <section class="seo-text" style="margin-top: 24px;">
+        <h3>Otras Ligas en Vivo</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+          {otherLeagues.map((league: string) => (
+            <a href={`/liga/${leagueSlug(league)}/`} class="channel-badge" style="text-decoration: none;">
+              {leagueFlags[league] || '⚽'} {league}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Back to Home -->
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Ver todos los partidos de hoy
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/hoy/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Partidos de Hoy →
+      </a>
+    </div>
+  </div>
+</Base>

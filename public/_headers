@@ -2,7 +2,46 @@
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
+# Static pages - cache 1 hour, revalidate in background
+/
+  Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400
+
+/rojadirecta-en-vivo/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400
+
+/tarjeta-roja/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400
+
+/pirlo-tv/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400
+
+# Match pages - 5 min cache so Bing sees fresh content
 /partido/*
-  Cache-Control: public, max-age=10800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=300, s-maxage=300, stale-while-revalidate=3600
+
+# League hub pages - 1 hour cache
+/liga/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400
+
+# Team hub pages - 1 hour cache
+/equipo/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400
+
+# Today page - 30 min cache
+/hoy/*
+  Cache-Control: public, max-age=1800, s-maxage=1800, stale-while-revalidate=43200
+
+# Embed pages - no cache, always fresh
+/embed/*
+  Cache-Control: public, max-age=900, s-maxage=900
+  X-Frame-Options: ALLOWALL
+
+# Sitemap - short cache for freshness signal
+/sitemap*.xml
+  Cache-Control: public, max-age=3600
+  Content-Type: application/xml
+
+# Static assets - long cache
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+import MatchCard from '../components/MatchCard.astro';
+import matchDataRaw from '../data/matches.json';
+
+const events = (matchDataRaw.events || []).slice(0, 4);
+
+function toSlug(event: any) {
+  const desc = `${event.league} ${event.teams}`
+    .toLowerCase().trim().replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  return `${event.id}-${desc}`;
+}
+
+const title = 'Página No Encontrada | Rojadirecta en Vivo';
+const description = 'La página que buscas no existe o el partido ya terminó. Ver partidos en vivo gratis en Rojadirecta.';
+const canonicalUrl = 'https://rojadirectaenvivo.top/404';
+---
+
+<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+  <div class="container" style="padding-top: 64px; text-align: center;">
+    <div style="font-size: 80px; margin-bottom: 16px;">⚽</div>
+    <h1 class="keyword-h1" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 12px;">
+      Este partido ya terminó
+    </h1>
+    <p class="keyword-sub" style="margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto;">
+      La página que buscas no existe o el partido ya no está disponible.
+      Pero tenemos más partidos en vivo ahora mismo.
+    </p>
+
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px;">
+      <a href="/" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--c-accent); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+        🏠 Ver Todos los Partidos
+      </a>
+      <a href="/hoy/" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--c-surface); color: var(--c-text-primary); text-decoration: none; border-radius: 8px; font-weight: 600; border: 1px solid var(--c-border);">
+        📅 Partidos de Hoy
+      </a>
+    </div>
+
+    {events.length > 0 && (
+      <div>
+        <h2 style="font-size: 1.2rem; color: var(--c-text-secondary); margin-bottom: 16px;">
+          Partidos disponibles ahora
+        </h2>
+        <div class="match-grid">
+          {events.map((event: any) => {
+            const slug = toSlug(event);
+            return (
+              <MatchCard
+                id={event.id}
+                slug={slug}
+                title={`${event.league}: ${event.teams}`}
+                league={event.league}
+                teams={event.teams}
+                time={event.time}
+                date={event.date}
+                channels={event.channels}
+              />
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
+</Base>

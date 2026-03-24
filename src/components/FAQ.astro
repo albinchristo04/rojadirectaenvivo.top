@@ -1,0 +1,24 @@
+---
+export interface Props {
+  items: { question: string; answer: string }[];
+}
+
+const { items } = Astro.props;
+
+import { buildFAQSchema } from '../utils/seo';
+const faqSchema = buildFAQSchema(items);
+---
+
+<section class="seo-text faq-section" style="margin-top: 24px;">
+  <h3>Preguntas Frecuentes</h3>
+  {items.map((faq, i) => (
+    <details style="margin-bottom: 12px;" open={i === 0}>
+      <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+        {faq.question}
+      </summary>
+      <p style="margin-top: 8px;">{faq.answer}</p>
+    </details>
+  ))}
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

@@ -1,25 +1,56 @@
 ---
 import Base from '../layouts/Base.astro';
-import MatchCard from '../components/MatchCard.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FAQ from '../components/FAQ.astro';
+import RelatedMatches from '../components/RelatedMatches.astro';
+import InternalLinks from '../components/InternalLinks.astro';
+import { getMatches } from '../utils/matches';
 
-import matchDataRaw from '../data/matches.json';
-
-const events = matchDataRaw.events || [];
-
-function toSlug(event: any) {
-  const desc = `${event.league} ${event.teams}`
-    .toLowerCase().trim().replace(/\s+/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-  return `${event.id}-${desc}`;
-}
+const events = getMatches();
 
 const title = 'Rojadirecta en Vivo – Ver Fútbol Online Gratis | Tarjeta Roja TV';
 const description = 'Rojadirecta en vivo te permite ver fútbol en vivo gratis hoy. Todos los partidos del día en directo. Mejor que Tarjeta Roja y Pirlo TV.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/rojadirecta-en-vivo/';
+
+const breadcrumbs = [
+  { name: 'Inicio', url: 'https://rojadirectaenvivo.top/' },
+  { name: 'Rojadirecta en Vivo', url: canonicalUrl },
+];
+
+const faqs = [
+  {
+    question: '¿Qué es Rojadirecta en Vivo?',
+    answer: 'Rojadirecta en Vivo es la evolución del clásico sitio Rojadirecta. En rojadirectaenvivo.top ofrecemos transmisiones en vivo de todos los partidos del día, gratis y sin registro.',
+  },
+  {
+    question: '¿Rojadirecta todavía funciona?',
+    answer: 'El sitio original de Rojadirecta ha tenido problemas de disponibilidad. En rojadirectaenvivo.top mantenemos la misma experiencia con una plataforma actualizada y rápida.',
+  },
+  {
+    question: '¿Cuál es la mejor alternativa a Rojadirecta?',
+    answer: 'rojadirectaenvivo.top es la mejor alternativa. Combinamos lo mejor de Rojadirecta, Tarjeta Roja y Pirlo TV con transmisiones actualizadas y múltiples canales por partido.',
+  },
+  {
+    question: '¿Necesito VPN para ver Rojadirecta en Vivo?',
+    answer: 'No, rojadirectaenvivo.top funciona sin VPN desde cualquier país. Nuestra plataforma está disponible globalmente sin restricciones geográficas.',
+  },
+];
+
+const internalLinks = [
+  { label: '⚽ Fútbol Libre', href: '/futbol-libre/' },
+  { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
+  { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
+  { label: '📺 Pirlo TV', href: '/pirlo-tv/' },
+  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
+  { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
+  { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
+];
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl}>
-  <div class="container">
+  <div class="container" style="padding-top: 32px;">
+    <Breadcrumb items={breadcrumbs} />
+
     <section class="keyword-hero">
       <h1 class="keyword-h1">Rojadirecta en Vivo</h1>
       <p class="keyword-sub">Fútbol en vivo gratis — todos los partidos de hoy en directo</p>
@@ -53,28 +84,20 @@ const canonicalUrl = 'https://rojadirectaenvivo.top/rojadirecta-en-vivo/';
       </p>
     </div>
 
-    <h2 class="keyword-text-title">Partidos de Hoy</h2>
+    <RelatedMatches matches={events} title="Partidos de Hoy" />
 
-    {events.length > 0 ? (
-      <div class="match-grid">
-        {events.map((event: any) => {
-          const slug = toSlug(event);
-          return (
-            <MatchCard
-              id={event.id}
-              slug={slug}
-              title={`${event.league}: ${event.teams}`}
-              league={event.league}
-              teams={event.teams}
-              time={event.time}
-              date={event.date}
-              channels={event.channels}
-            />
-          );
-        })}
-      </div>
-    ) : (
-      <p style="color: var(--c-text-secondary);">No hay partidos disponibles en este momento.</p>
-    )}
+    <FAQ items={faqs} />
+
+    <InternalLinks links={internalLinks} />
+
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
+      <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        ← Ver todos los partidos
+      </a>
+      <span style="margin: 0 16px; color: var(--c-text-muted);">|</span>
+      <a href="/hoy/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
+        Partidos de Hoy →
+      </a>
+    </div>
   </div>
 </Base>
