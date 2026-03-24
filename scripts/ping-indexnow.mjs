@@ -28,13 +28,23 @@ async function main() {
     process.exit(0);
   }
 
+  // Handle both { data: [...] } and plain array formats
+  const matchList = Array.isArray(matches) ? matches : (matches.data ?? []);
+
+  if (matchList.length === 0) {
+    console.warn('⚠️ No matches found in matches.json. Skipping IndexNow ping.');
+    process.exit(0);
+  }
+
   const urls = [
     `${SITE}/`,
     `${SITE}/rojadirecta-en-vivo/`,
     `${SITE}/tarjeta-roja/`,
     `${SITE}/pirlo-tv/`,
-    ...matches.data.map(e => `${SITE}/partido/${toSlug(e)}/`),
+    ...matchList.map(e => `${SITE}/partido/${toSlug(e)}/`),
   ];
+  // ... rest of the function
+}
 
   console.log(`📤 Submitting ${urls.length} URLs to Bing IndexNow...`);
 
