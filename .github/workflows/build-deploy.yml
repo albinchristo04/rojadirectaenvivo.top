@@ -40,7 +40,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: rojadirectaenvivo-top
+          projectName: toproja
           directory: dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
