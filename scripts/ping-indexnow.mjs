@@ -9,7 +9,7 @@ if (!KEY) {
 }
 
 function toSlug(event) {
-  const desc = (event.attributes.diary_description || '')
+  const desc = (event.attributes?.diary_description || '')
     .toLowerCase()
     .trim()
     .replace(/\s+/g, ' ')
@@ -21,6 +21,7 @@ function toSlug(event) {
 
 async function main() {
   let matches;
+
   try {
     matches = JSON.parse(readFileSync('./src/data/matches.json', 'utf8'));
   } catch {
@@ -43,8 +44,6 @@ async function main() {
     `${SITE}/pirlo-tv/`,
     ...matchList.map(e => `${SITE}/partido/${toSlug(e)}/`),
   ];
-  // ... rest of the function
-}
 
   console.log(`📤 Submitting ${urls.length} URLs to Bing IndexNow...`);
 
@@ -59,7 +58,6 @@ async function main() {
         urlList: urls,
       }),
     });
-
     console.log(`✅ IndexNow response: ${res.status} ${res.statusText}`);
   } catch (err) {
     console.error('❌ IndexNow ping failed:', err.message);
