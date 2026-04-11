@@ -197,18 +197,8 @@ const langFlags: Record<string, string> = {
   <!-- Two-column layout -->
   <div class="match-layout">
     <div>
-      <!-- Ad: Above video player -->
-      <div class="ad-unit ad-above-player">
-        <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-      </div>
-
       <!-- Player -->
       <MatchPlayer channels={event.channels} matchTitle={event.teams} />
-
-      <!-- Ad: Below video player -->
-      <div class="ad-unit ad-below-player">
-        <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-      </div>
 
       <!-- SEO text -->
       <section class="seo-text">
@@ -226,11 +216,6 @@ const langFlags: Record<string, string> = {
           En <strong>rojadirectaenvivo.top</strong> encontrarás todos los partidos del día en vivo.
         </p>
       </section>
-
-      <!-- Ad: Between match info and FAQ -->
-      <div class="ad-unit ad-mid-content">
-        <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-      </div>
 
       <!-- FAQ Section -->
       <section class="seo-text faq-section" style="margin-top: 24px;">
@@ -318,10 +303,6 @@ const langFlags: Record<string, string> = {
 
       {relatedMatches.length > 0 && (
         <div style="margin-top:24px;">
-          <!-- Ad: Above related matches -->
-          <div class="ad-unit ad-before-related">
-            <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-          </div>
           <h3 class="sidebar-title">Ver Más Partidos</h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
             {relatedMatches.map((m: any) => {

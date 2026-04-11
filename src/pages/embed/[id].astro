@@ -48,11 +48,6 @@ const matchTitle = event.teams || 'Partido en Vivo';
 </head>
 <body>
   <div class="embed-container">
-    <!-- Ad: Above embed player -->
-    <div class="ad-unit ad-embed-top">
-      <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-    </div>
-
     <div class="embed-wrap">
       <a class="branding" href="https://rojadirectaenvivo.top/" target="_blank" rel="noopener">
         <span>ROJA</span>DIRECTAENVIVO
@@ -60,10 +55,6 @@ const matchTitle = event.teams || 'Partido en Vivo';
       <div id="player-frame" data-src={embedUrl} data-title={matchTitle}></div>
     </div>
 
-    <!-- Ad: Below embed player -->
-    <div class="ad-unit ad-embed-bottom">
-      <script async src="https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js"></script>
-    </div>
   </div>
 
   <script is:inline>
@@ -85,18 +76,15 @@ const matchTitle = event.teams || 'Partido en Vivo';
         f[_k[4]](_k[19],_k[20]);f[_k[4]](_k[21],_k[22]);
         c[_k[18]](f);
       }
-      // Embed popup: fire once on load, once on first click
-      var AD_URL='https://pl28966065.profitablecpmratenetwork.com/ce/d5/d6/ced5d6352f962e495dc68dc32aabe314.js';
-      setTimeout(function(){
-        var s=document.createElement('script');s.src=AD_URL;document.head.appendChild(s);
-      },1500);
-      var embedAdFired=false;
-      document.addEventListener('click',function(){
-        if(!embedAdFired){
-          var s=document.createElement('script');s.src=AD_URL;document.head.appendChild(s);
-          embedAdFired=true;
-        }
-      });
+      // Monetag popunder — fire on first click (player tap = natural trigger)
+      var _adFired=false;
+      function _loadPop(){
+        if(_adFired)return;_adFired=true;
+        (function(s){s.dataset.zone='10848709';s.src='https://al5sm.com/tag.min.js';})
+        ([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+      }
+      document.addEventListener('click',_loadPop,{once:true});
+      document.addEventListener('touchend',_loadPop,{once:true});
     })();
   </script>
 </body>
