@@ -35,6 +35,12 @@ jobs:
         env:
           SITE_URL: https://rojadirectaenvivo.top
 
+      - name: Create IndexNow Key File
+        run: |
+          if [ -n "${{ secrets.INDEXNOW_KEY }}" ]; then
+            echo "${{ secrets.INDEXNOW_KEY }}" > dist/${{ secrets.INDEXNOW_KEY }}.txt
+          fi
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
