@@ -1,12 +1,7 @@
 import { readFileSync } from 'fs';
 
-const KEY = process.env.INDEXNOW_KEY;
+const KEY = '3b3f11d1ebc347dd9c77176d63c93ee5';
 const SITE = 'https://rojadirectaenvivo.top';
-
-if (!KEY) {
-  console.warn('⚠️ INDEXNOW_KEY not set. Skipping IndexNow ping.');
-  process.exit(0);
-}
 
 // Must match the toSlug in Astro pages (league + teams)
 function toSlug(event) {
