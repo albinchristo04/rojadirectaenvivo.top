@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 
-const KEY = '3b3f11d1ebc347dd9c77176d63c93ee5';
+const KEY = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4';
 const SITE = 'https://rojadirectaenvivo.top';
 
 // Must match the toSlug in Astro pages (league + teams)
