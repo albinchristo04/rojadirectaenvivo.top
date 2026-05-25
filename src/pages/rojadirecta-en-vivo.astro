@@ -5,11 +5,12 @@ import FAQ from '../components/FAQ.astro';
 import RelatedMatches from '../components/RelatedMatches.astro';
 import InternalLinks from '../components/InternalLinks.astro';
 import { getMatches } from '../utils/matches';
+import { buildBreadcrumbSchema } from '../utils/seo';
 
 const events = getMatches();
 
-const title = 'Rojadirecta en Vivo – Ver Fútbol Online Gratis | Tarjeta Roja TV';
-const description = 'Rojadirecta en vivo te permite ver fútbol en vivo gratis hoy. Todos los partidos del día en directo. Mejor que Tarjeta Roja y Pirlo TV.';
+const title = 'Rojadirecta en Vivo Hoy | Roja Directa, Liga MX y Libertadores';
+const description = 'Rojadirecta en vivo hoy con partidos de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas. Roja Directa en español con alternativa a Pirlo TV y Tarjeta Roja.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/rojadirecta-en-vivo/';
 
 const breadcrumbs = [
@@ -17,23 +18,62 @@ const breadcrumbs = [
   { name: 'Rojadirecta en Vivo', url: canonicalUrl },
 ];
 
+const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbs);
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Rojadirecta en Vivo',
+  description,
+  url: canonicalUrl,
+  inLanguage: 'es',
+  about: [
+    { '@type': 'Thing', name: 'Rojadirecta' },
+    { '@type': 'Thing', name: 'Roja Directa' },
+    { '@type': 'Thing', name: 'Liga MX' },
+    { '@type': 'Thing', name: 'Liga Profesional Argentina' },
+    { '@type': 'Thing', name: 'Copa Libertadores' },
+  ],
+};
+
+const speakableSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: canonicalUrl,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.keyword-h1', '.keyword-sub', '.bing-resumen', '.keyword-text'],
+  },
+};
+
 const faqs = [
   {
-    question: '¿Qué es Rojadirecta en Vivo?',
-    answer: 'Rojadirecta en Vivo es la evolución del clásico sitio Rojadirecta. En rojadirectaenvivo.top ofrecemos transmisiones en vivo de todos los partidos del día, gratis y sin registro.',
+    question: '¿Dónde ver Rojadirecta en vivo hoy?',
+    answer: 'En rojadirectaenvivo.top puedes ver Rojadirecta en vivo hoy con foco en partidos de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas internacionales, todo en español.',
   },
   {
     question: '¿Rojadirecta todavía funciona?',
-    answer: 'El sitio original de Rojadirecta ha tenido problemas de disponibilidad. En rojadirectaenvivo.top mantenemos la misma experiencia con una plataforma actualizada y rápida.',
+    answer: 'La marca Rojadirecta sigue teniendo mucha demanda, pero aquí reunimos una alternativa más estable con páginas por liga, equipo y partido para responder mejor a cada búsqueda.',
   },
   {
-    question: '¿Cuál es la mejor alternativa a Rojadirecta?',
-    answer: 'rojadirectaenvivo.top es la mejor alternativa. Combinamos lo mejor de Rojadirecta, Tarjeta Roja y Pirlo TV con transmisiones actualizadas y múltiples canales por partido.',
+    question: '¿Cuál es la mejor alternativa a Roja Directa?',
+    answer: 'rojadirectaenvivo.top combina la intención de Roja Directa, Pirlo TV, Tarjeta Roja y Fútbol Libre con una estructura más clara, enlaces internos y horarios visibles.',
   },
   {
     question: '¿Necesito VPN para ver Rojadirecta en Vivo?',
-    answer: 'No, rojadirectaenvivo.top funciona sin VPN desde cualquier país. Nuestra plataforma está disponible globalmente sin restricciones geográficas.',
+    answer: 'No. El sitio está pensado para funcionar desde navegador y ofrecer acceso rápido a los partidos disponibles sin registro.',
   },
+];
+
+const hubLinks = [
+  { label: '🇲🇽 Liga MX', href: '/liga/liga-mx/' },
+  { label: '🇦🇷 Liga Argentina', href: '/liga/liga-profesional-argentina/' },
+  { label: '🇧🇷 Brasileirão', href: '/liga/brasileirao/' },
+  { label: '🇨🇴 Liga BetPlay', href: '/liga/liga-betplay-dimayor/' },
+  { label: '🇪🇨 LigaPro Ecuador', href: '/liga/ligapro-ecuador/' },
+  { label: '🇺🇸 MLS', href: '/liga/mls/' },
+  { label: '🌎 Copa Libertadores', href: '/liga/copa-libertadores/' },
+  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
 ];
 
 const internalLinks = [
@@ -41,54 +81,64 @@ const internalLinks = [
   { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
   { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
   { label: '📺 Pirlo TV', href: '/pirlo-tv/' },
-  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
   { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
   { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
+  { label: '📆 Hoy', href: '/hoy/' },
 ];
 ---
 
-<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={pageSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
+
   <div class="container" style="padding-top: 32px;">
     <Breadcrumb items={breadcrumbs} />
 
     <section class="keyword-hero">
       <h1 class="keyword-h1">Rojadirecta en Vivo</h1>
-      <p class="keyword-sub">Fútbol en vivo gratis — todos los partidos de hoy en directo</p>
+      <p class="keyword-sub">Roja Directa hoy con prioridad para Liga MX, Libertadores y fútbol latinoamericano</p>
+    </section>
+
+    <section class="seo-text bing-resumen" style="margin-top: 0; margin-bottom: 24px;">
+      <h2>Resumen rápido</h2>
+      <p>
+        Esta landing responde a búsquedas como <strong>rojadirecta en vivo hoy</strong> y <strong>roja directa en vivo</strong>
+        mostrando partidos, ligas y rutas internas pensadas para usuarios de Latinoamérica.
+      </p>
     </section>
 
     <div class="keyword-text">
       <p>
-        <strong>Rojadirecta en Vivo</strong> es tu portal definitivo para ver <strong>fútbol en vivo gratis</strong> desde cualquier lugar del mundo.
-        Nuestra plataforma te ofrece acceso directo a todos los partidos del día, con múltiples canales de transmisión para que nunca te pierdas un gol.
-        Somos la alternativa perfecta a <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
+        <strong>Rojadirecta en Vivo</strong> es la consulta principal cuando alguien quiere encontrar fútbol en vivo gratis sin perder tiempo.
+        En <strong>rojadirectaenvivo.top</strong> convertimos esa intención en una portada temática con enlaces hacia partidos individuales,
+        hubs de liga y páginas de equipo que responden mejor a lo que busca el usuario.
       </p>
 
       <p>
-        En <strong>rojadirectaenvivo.top</strong> encontrarás transmisiones en vivo de las mejores ligas del mundo:
-        LaLiga Española, Premier League, Serie A, Bundesliga, Liga MX, Liga Profesional Argentina,
-        Copa Libertadores, Champions League y muchas más. Todo gratis y sin necesidad de registro.
+        Para Bing y para las búsquedas reales del mercado hispano, no basta con mencionar ligas europeas. Por eso esta página da prioridad a
+        <strong> Liga MX</strong>, <strong>fútbol argentino</strong>, <strong>Brasileirão</strong>,
+        <strong> Liga BetPlay Colombia</strong>, <strong>LigaPro Ecuador</strong>, <strong>Chile</strong>,
+        <strong> Uruguay</strong>, <strong>MLS</strong> y <strong>Copa Libertadores</strong>.
       </p>
 
       <p>
-        La <strong>roja directa</strong> nunca fue tan fácil de acceder. Con solo un clic puedes ver tu partido favorito
-        en vivo y en directo. Nuestros streams se actualizan cada 3 horas para garantizar que siempre tengas
-        la información más reciente. Ya sea que busques <strong>rojadirecta</strong>, <strong>tarjeta roja en vivo</strong>
-        o <strong>pirlo tv rojadirecta</strong>, aquí encontrarás todo lo que necesitas.
+        Cuando alguien busca <strong>roja directa</strong>, normalmente quiere una respuesta inmediata: qué partidos hay, a qué hora se juegan y dónde verlos.
+        Esa es la lógica de esta landing. Desde aquí puedes entrar a páginas más concretas según el torneo o el partido y encontrar una respuesta más precisa.
       </p>
 
       <p>
-        No importa si estás en España, Argentina, México, Colombia o cualquier otro país hispanohablante —
-        <strong>Rojadirecta en Vivo</strong> funciona en todo el mundo. Ver <strong>futbol en vivo</strong>
-        gratis es posible gracias a nuestra red de canales y transmisiones. Disfruta del mejor
-        <strong>fútbol en vivo gratis hoy</strong> sin complicaciones.
+        También servimos como alternativa clara a <strong>Pirlo TV</strong>, <strong>Tarjeta Roja</strong> y <strong>Fútbol Libre</strong>.
+        El objetivo no es solo atraer una keyword fuerte, sino distribuir esa autoridad hacia páginas internas con mejor oportunidad de indexar y ser citadas.
       </p>
     </div>
 
-    <RelatedMatches matches={events} title="Partidos de Hoy" />
+    <InternalLinks links={hubLinks} title="Ligas destacadas en Rojadirecta" />
+
+    <RelatedMatches matches={events} title="Rojadirecta Hoy — Partidos en Vivo" />
 
     <FAQ items={faqs} />
 
-    <InternalLinks links={internalLinks} />
+    <InternalLinks links={internalLinks} title="Más páginas relacionadas" />
 
     <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
       <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">

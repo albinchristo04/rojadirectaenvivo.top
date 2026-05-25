@@ -21,21 +21,34 @@ import '../styles/global.css';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  <meta name="language" content="es" />
   <link rel="canonical" href={canonicalUrl} />
   <meta name="robots" content="index, follow" />
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:locale" content="es_ES" />
   <meta property="og:image" content={resolvedOgImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={resolvedOgImage} />
   <meta name="theme-color" content="#E8001D" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet" />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Rojadirecta en Vivo',
+    url: 'https://rojadirectaenvivo.top/',
+    logo: resolvedOgImage,
+    inLanguage: 'es',
+  })} />
   {matchSchema && (
     <script type="application/ld+json" set:html={JSON.stringify(matchSchema)} />
   )}

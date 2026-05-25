@@ -1,53 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import MatchCard from '../components/MatchCard.astro';
+import { getMatches, getUniqueLeagues, groupByLeague } from '../utils/matches';
+import { leagueFlags, leagueSlug, toSlug } from '../utils/seo';
 
-import matchDataRaw from '../data/matches.json';
+const events = getMatches();
+const grouped = groupByLeague();
+const featuredLeagues = getUniqueLeagues().slice(0, 8);
+const tickerText = events.map((event) => event.teams).join(' · ');
 
-const events = matchDataRaw.events || [];
-
-// Helper: generate slug
-function toSlug(event: any) {
-  const desc = `${event.league} ${event.teams}`
-    .toLowerCase().trim().replace(/\s+/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-  return `${event.id}-${desc}`;
-}
-
-function leagueSlug(league: string) {
-  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
-
-// Group matches by league
-const grouped: Record<string, any[]> = {};
-for (const event of events) {
-  const key = event.league || 'Otros';
-  if (!grouped[key]) grouped[key] = [];
-  grouped[key].push(event);
-}
-
-// Sort matches within each group by time
-for (const key in grouped) {
-  grouped[key].sort((a: any, b: any) => (a.time || '').localeCompare(b.time || ''));
-}
-
-// League to emoji mapping
-const leagueFlags: Record<string, string> = {
-  'Laliga': '🇪🇸', 'Laliga 2': '🇪🇸', 'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  'Serie A': '🇮🇹', 'Bundesliga': '🇩🇪', 'Bundesliga 2': '🇩🇪',
-  'Ligue 1': '🇫🇷', 'Ligue 2': '🇫🇷', 'Eredivisie': '🇳🇱',
-  'Liga Mx': '🇲🇽', 'Liga Endesa': '🇪🇸', 'Torneo LPF': '🇦🇷',
-  'Copa Libertadores': '🌎', 'Champions League': '🇪🇺',
-  'Liga AUF Uruguaya': '🇺🇾', 'Liga Betplay Dimayor': '🇨🇴',
-  'Ecuador Ligapro': '🇪🇨', 'Premiership': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  'NBA': '🇺🇸', 'NHL': '🇺🇸', 'NFL': '🇺🇸', 'MLB': '🇺🇸',
-};
-
-// Build ticker text
-const tickerText = events.map((e: any) => e.teams).join(' · ');
-
-const title = 'Rojadirecta en Vivo 🔴 Fútbol Gratis | Tarjeta Roja TV';
-const description = 'Ver fútbol en vivo gratis hoy. Rojadirecta en vivo, Tarjeta Roja, Pirlo TV - todos los partidos del día en rojadirectaenvivo.top';
+const title = 'Rojadirecta en Vivo 🔴 Fútbol en Vivo Gratis | Tarjeta Roja TV Pirlo TV';
+const description = 'Ver fútbol en vivo gratis hoy con Rojadirecta en Vivo, Pirlo TV y Fútbol Libre. Liga MX, Argentina, Brasil, Colombia, Chile, Ecuador, MLS y más partidos del día.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/';
 
 const websiteSchema = {
@@ -55,18 +18,69 @@ const websiteSchema = {
   "@type": "WebSite",
   "name": "Rojadirecta en Vivo",
   "url": "https://rojadirectaenvivo.top",
-  "description": "Ver fútbol en vivo gratis - Rojadirecta, Tarjeta Roja, Pirlo TV",
+  "description": description,
   "inLanguage": "es",
+  "keywords": [
+    "rojadirecta en vivo",
+    "pirlo tv",
+    "futbol libre",
+    "roja directa en vivo",
+    "liga mx en vivo",
+    "futbol argentino en vivo"
+  ],
   "potentialAction": {
     "@type": "SearchAction",
     "target": "https://rojadirectaenvivo.top/?q={search_term_string}",
     "query-input": "required name=search_term_string"
   }
 };
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Dónde ver Pirlo TV, Fútbol Libre y Roja Directa en Vivo hoy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En rojadirectaenvivo.top reunimos partidos en vivo, horarios y canales actualizados con foco en búsquedas como Pirlo TV, Fútbol Libre y Roja Directa en Vivo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué ligas latinoamericanas aparecen hoy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Priorizamos hubs para Liga MX, fútbol argentino, Brasileirão, Liga BetPlay Colombia, LigaPro Ecuador, Primera División Chile, Uruguay y MLS cuando hay partidos disponibles."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cada cuánto se actualiza la portada?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La portada se actualiza automáticamente con el feed de partidos más reciente para que Bing y los usuarios encuentren horarios y transmisiones vigentes."
+      }
+    }
+  ]
+};
+
+const speakableSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "url": canonicalUrl,
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [".keyword-h1", ".keyword-sub", ".bing-resumen", ".seo-text"]
+  }
+};
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={websiteSchema}>
-  <!-- Ticker Bar -->
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
+
   {events.length > 0 && (
     <div class="ticker">
       <div class="ticker-label">📡 EN VIVO HOY</div>
@@ -78,7 +92,26 @@ const websiteSchema = {
     <h1 class="keyword-h1" style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 8px;">
       Rojadirecta en Vivo
     </h1>
-    <p class="keyword-sub" style="margin-bottom: 32px;">Fútbol en vivo gratis — todos los partidos de hoy en directo</p>
+    <p class="keyword-sub" style="margin-bottom: 24px;">Fútbol en vivo gratis, Pirlo TV y Fútbol Libre con foco en Latinoamérica</p>
+
+    {featuredLeagues.length > 0 && (
+      <section class="bing-resumen seo-text" style="margin-top: 0; margin-bottom: 24px;">
+        <h2>Hubs principales para Bing</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px;">
+          {featuredLeagues.map((league) => (
+            <a href={`/liga/${leagueSlug(league)}/`} class="channel-badge" style="text-decoration: none;">
+              {leagueFlags[league] || '⚽'} {league}
+            </a>
+          ))}
+        </div>
+        <p>
+          Esta portada prioriza búsquedas de <strong>Pirlo TV</strong>, <strong>Fútbol Libre</strong> y
+          <strong> Roja Directa en Vivo</strong> con hubs dedicados para <strong>Liga MX</strong>,
+          <strong> fútbol argentino</strong>, <strong>Brasileirão</strong>, <strong>Liga BetPlay</strong>,
+          <strong> LigaPro Ecuador</strong>, <strong>Chile</strong>, <strong>Uruguay</strong> y <strong>MLS</strong>.
+        </p>
+      </section>
+    )}
 
     {events.length === 0 ? (
       <div style="text-align: center; padding: 64px 0;">
@@ -99,41 +132,68 @@ const websiteSchema = {
             </div>
 
             <div class="match-grid">
-              {leagueMatches.map((event: any) => {
-                const slug = toSlug(event);
-                return (
-                  <MatchCard
-                    id={event.id}
-                    slug={slug}
-                    title={`${event.league}: ${event.teams}`}
-                    league={event.league}
-                    teams={event.teams}
-                    time={event.time}
-                    date={event.date}
-                    channels={event.channels}
-                  />
-                );
-              })}
+              {leagueMatches.map((event: any) => (
+                <MatchCard
+                  id={event.id}
+                  slug={toSlug(event)}
+                  title={`${event.league}: ${event.teams}`}
+                  league={event.league}
+                  teams={event.teams}
+                  time={event.time}
+                  date={event.date}
+                  channels={event.channels}
+                />
+              ))}
             </div>
           </section>
         ))}
       </div>
     )}
 
-    <!-- SEO Text -->
     <section class="seo-text">
       <h2>Rojadirecta en Vivo – Ver Fútbol Gratis</h2>
       <p>
         Bienvenido a <strong>Rojadirecta en Vivo</strong>, tu destino para ver fútbol en vivo gratis hoy.
-        Aquí encontrarás todos los partidos del día transmitidos en directo, igual que en
-        <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>RojaDirecta TV</strong>.
-        Disfruta de la <strong>roja directa</strong> sin cortes y en alta definición.
+        Aquí encontrarás partidos del día transmitidos en directo, igual que en
+        <strong> Tarjeta Roja</strong>, <strong>Pirlo TV</strong> y <strong>Fútbol Libre</strong>,
+        con una cobertura priorizada para el público de <strong>Latinoamérica</strong>.
       </p>
       <p>
-        Seguimos todos los campeonatos en vivo: LaLiga, Premier League, Serie A, Bundesliga,
-        Liga MX, Liga Profesional Argentina, Copa Libertadores y mucho más.
-        Ver <strong>futbol en vivo</strong> nunca fue tan fácil — sin registro, sin pago, gratis.
+        Seguimos <strong>Liga MX</strong>, <strong>Liga Profesional Argentina</strong>,
+        <strong> Brasileirão</strong>, <strong>Liga BetPlay Colombia</strong>,
+        <strong> LigaPro Ecuador</strong>, <strong>Primera División Chile</strong>,
+        <strong> MLS</strong>, <strong>Copa Libertadores</strong> y más hubs relevantes para búsquedas en Bing.
+        Ver <strong>futbol en vivo</strong> nunca fue tan fácil: horarios, canales y páginas internas listas para citar.
       </p>
+    </section>
+
+    <section class="seo-text" style="margin-top: 24px;">
+      <h3>Preguntas Frecuentes</h3>
+      <details style="margin-bottom: 12px;" open>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿Dónde ver Roja Directa en Vivo hoy?
+        </summary>
+        <p style="margin-top: 8px;">
+          En rojadirectaenvivo.top publicamos la cartelera diaria con horarios, hubs por liga y canales disponibles.
+          La portada resume los partidos más relevantes para usuarios que buscan Pirlo TV, Fútbol Libre y Roja Directa.
+        </p>
+      </details>
+      <details style="margin-bottom: 12px;">
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿Qué ligas latinoamericanas priorizan?
+        </summary>
+        <p style="margin-top: 8px;">
+          Priorizamos Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, Uruguay y MLS, además de copas continentales.
+        </p>
+      </details>
+      <details>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿Esta página se actualiza automáticamente?
+        </summary>
+        <p style="margin-top: 8px;">
+          Sí. El sitio renueva el feed y reorganiza los hubs para que Bing y los usuarios vean siempre la agenda más reciente.
+        </p>
+      </details>
     </section>
   </div>
 </Base>

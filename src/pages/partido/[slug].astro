@@ -4,25 +4,13 @@ import MatchPlayer from '../../components/MatchPlayer.astro';
 import MatchCard from '../../components/MatchCard.astro';
 import LocalTime from '../../components/LocalTime.astro';
 import matchDataRaw from '../../data/matches.json';
+import { leagueSlug, teamSlug, toSlug } from '../../utils/seo';
 
 const allEvents = matchDataRaw.events || [];
 
-function toSlug(event: any) {
-  const desc = `${event.league} ${event.teams}`
-    .toLowerCase().trim().replace(/\s+/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-  return `${event.id}-${desc}`;
-}
-
 export function getStaticPaths() {
   const events = matchDataRaw.events || [];
-  return events.map((event: any) => {
-    const desc = `${event.league} ${event.teams}`
-      .toLowerCase().trim().replace(/\s+/g, ' ')
-      .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-    const slug = `${event.id}-${desc}`;
-    return { params: { slug }, props: { event } };
-  });
+  return events.map((event: any) => ({ params: { slug: toSlug(event) }, props: { event } }));
 }
 
 const { event } = Astro.props;
@@ -65,16 +53,9 @@ function detectSport(league: string): string {
   return 'Football';
 }
 const detectedSport = detectSport(event.league);
-
-function leagueSlug(league: string) {
-  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
-function teamSlugFn(name: string) {
-  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
 const currentLeagueSlug = leagueSlug(event.league);
-const teamASlug = teamSlugFn(teamA);
-const teamBSlug = teamSlugFn(teamB);
+const teamASlug = teamSlug(teamA);
+const teamBSlug = teamSlug(teamB);
 
 // Fresh content date for Bing
 const publishDate = `${isoDate}T${event.time || '00:00'}:00-03:00`;

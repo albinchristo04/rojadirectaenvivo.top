@@ -5,11 +5,12 @@ import FAQ from '../components/FAQ.astro';
 import RelatedMatches from '../components/RelatedMatches.astro';
 import InternalLinks from '../components/InternalLinks.astro';
 import { getMatches } from '../utils/matches';
+import { buildBreadcrumbSchema } from '../utils/seo';
 
 const events = getMatches();
 
-const title = 'Pirlo TV en Vivo – Fútbol Online Gratis | Rojadirecta Tarjeta Roja';
-const description = 'Pirlo TV en vivo para ver fútbol online gratis. Todos los partidos del día en directo - Rojadirecta, Tarjeta Roja, roja directa.';
+const title = 'Pirlo TV en Vivo Hoy | Liga MX, Libertadores y Fútbol Libre';
+const description = 'Pirlo TV en vivo hoy con partidos de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas. Rojadirecta, Fútbol Libre y Tarjeta Roja en español.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/pirlo-tv/';
 
 const breadcrumbs = [
@@ -17,77 +18,131 @@ const breadcrumbs = [
   { name: 'Pirlo TV', url: canonicalUrl },
 ];
 
+const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbs);
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Pirlo TV en Vivo',
+  description,
+  url: canonicalUrl,
+  inLanguage: 'es',
+  about: [
+    { '@type': 'Thing', name: 'Pirlo TV' },
+    { '@type': 'Thing', name: 'Fútbol Libre' },
+    { '@type': 'Thing', name: 'Rojadirecta en Vivo' },
+    { '@type': 'Thing', name: 'Liga MX' },
+    { '@type': 'Thing', name: 'Copa Libertadores' },
+  ],
+};
+
+const speakableSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: canonicalUrl,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.keyword-h1', '.keyword-sub', '.bing-resumen', '.keyword-text'],
+  },
+};
+
 const faqs = [
   {
-    question: '¿Qué es Pirlo TV?',
-    answer: 'Pirlo TV es una plataforma popular para ver fútbol en vivo gratis. En rojadirectaenvivo.top ofrecemos la misma experiencia con transmisiones actualizadas y múltiples canales por partido.',
+    question: '¿Dónde ver Pirlo TV en vivo hoy?',
+    answer: 'En rojadirectaenvivo.top puedes ver Pirlo TV en vivo hoy con horarios, enlaces y canales actualizados para los partidos del día, especialmente de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas.',
+  },
+  {
+    question: '¿Pirlo TV sirve para fútbol latinoamericano?',
+    answer: 'Sí. Esta página está pensada para usuarios que buscan Pirlo TV para ver fútbol latinoamericano en español, con foco en ligas de México, Argentina, Brasil, Colombia, Ecuador, Chile, Uruguay y torneos continentales.',
   },
   {
     question: '¿Pirlo TV sigue funcionando?',
-    answer: 'El sitio original de Pirlo TV ha cambiado varias veces. En rojadirectaenvivo.top mantenemos la experiencia de PirloTV con una plataforma estable y actualizada.',
+    answer: 'El nombre Pirlo TV sigue concentrando búsquedas, pero aquí reunimos una alternativa estable con páginas propias por partido, hubs por liga y varias opciones de canal sin registro.',
   },
   {
-    question: '¿Pirlo TV es seguro?',
-    answer: 'rojadirectaenvivo.top es seguro para navegar. Nuestra plataforma no requiere descargas ni registros para ver los partidos en vivo.',
+    question: '¿Qué partidos aparecen hoy en Pirlo TV?',
+    answer: `Hoy mostramos ${events.length} partidos disponibles con actualización automática del feed. Cada partido tiene horario, canales y una página individual para encontrar la transmisión rápida.` ,
   },
+];
+
+const hubLinks = [
+  { label: '🇲🇽 Liga MX', href: '/liga/liga-mx/' },
+  { label: '🇦🇷 Liga Argentina', href: '/liga/liga-profesional-argentina/' },
+  { label: '🇧🇷 Brasileirão', href: '/liga/brasileirao/' },
+  { label: '🇨🇴 Liga BetPlay', href: '/liga/liga-betplay-dimayor/' },
+  { label: '🇪🇨 LigaPro Ecuador', href: '/liga/ligapro-ecuador/' },
+  { label: '🇺🇸 MLS', href: '/liga/mls/' },
+  { label: '🌎 Copa Libertadores', href: '/liga/copa-libertadores/' },
+  { label: '📅 Partidos de Hoy', href: '/hoy/' },
 ];
 
 const internalLinks = [
   { label: '⚽ Fútbol Libre', href: '/futbol-libre/' },
-  { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
   { label: '🔴 Rojadirecta en Vivo', href: '/rojadirecta-en-vivo/' },
   { label: '🟥 Tarjeta Roja', href: '/tarjeta-roja/' },
-  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
+  { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
   { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
   { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
 ];
 ---
 
-<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={pageSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
+
   <div class="container" style="padding-top: 32px;">
     <Breadcrumb items={breadcrumbs} />
 
     <section class="keyword-hero">
       <h1 class="keyword-h1">Pirlo TV</h1>
-      <p class="keyword-sub">Rojadirecta en vivo gratis — fútbol online sin registro</p>
+      <p class="keyword-sub">Pirlo TV en vivo hoy con foco en Liga MX, Libertadores y fútbol latinoamericano</p>
+    </section>
+
+    <section class="seo-text bing-resumen" style="margin-top: 0; margin-bottom: 24px;">
+      <h2>Resumen rápido</h2>
+      <p>
+        Si buscas <strong>Pirlo TV en vivo hoy</strong>, esta página resume en español dónde ver los partidos del día,
+        con prioridad para <strong>México</strong>, <strong>Argentina</strong>, <strong>Brasil</strong>,
+        <strong> Colombia</strong>, <strong>Ecuador</strong>, <strong>Chile</strong>, <strong>MLS</strong>
+        y <strong>Copa Libertadores</strong>.
+      </p>
     </section>
 
     <div class="keyword-text">
       <p>
-        <strong>Pirlo TV</strong> ha sido durante años uno de los sitios más populares para ver
-        <strong>fútbol en vivo gratis</strong> en español. En <strong>rojadirectaenvivo.top</strong>
-        ofrecemos la misma experiencia y calidad que <strong>PirloTV</strong> con todas las
-        transmisiones del día actualizadas automáticamente.
+        <strong>Pirlo TV</strong> sigue siendo una de las búsquedas más fuertes para encontrar <strong>fútbol en vivo gratis</strong>.
+        En <strong>rojadirectaenvivo.top</strong> reunimos esa intención en una página clara, en español y pensada para el público latinoamericano.
+        Aquí no solo ves un listado genérico: encuentras <strong>horarios</strong>, <strong>canales</strong> y enlaces rápidos a cada partido.
       </p>
 
       <p>
-        Si estás buscando <strong>pirlo tv rojadirecta</strong>, aquí encontrarás exactamente lo que necesitas.
-        Nuestra plataforma combina lo mejor de <strong>Pirlo TV</strong>, <strong>Rojadirecta</strong> y
-        <strong>Tarjeta Roja</strong> en un solo lugar. Cada partido tiene múltiples opciones de canales
-        para que siempre puedas encontrar una transmisión que funcione perfectamente.
+        La mayor demanda llega desde consultas como <strong>pirlo tv liga mx</strong>, <strong>pirlo tv libertadores</strong>,
+        <strong> pirlo tv futbol libre</strong> o <strong>pirlo tv roja directa</strong>. Por eso priorizamos partidos de
+        <strong> Liga MX</strong>, <strong>fútbol argentino</strong>, <strong>Brasileirão</strong>,
+        <strong> Liga BetPlay Colombia</strong>, <strong>LigaPro Ecuador</strong>, <strong>Chile</strong>,
+        <strong> Uruguay</strong> y <strong>MLS</strong>, además de las grandes copas continentales.
       </p>
 
       <p>
-        <strong>PirloTV</strong> en rojadirectaenvivo.top cubre todas las competiciones importantes:
-        LaLiga Santander, Premier League, Serie A de Italia, Bundesliga, Ligue 1, Liga MX,
-        Liga Profesional Argentina, Copa Libertadores, Copa Sudamericana, Champions League,
-        Europa League y Conference League. Todo el <strong>fútbol en vivo</strong> que puedas imaginar.
+        Cada encuentro visible en la cartelera tiene su propia página con información directa: quién juega, a qué hora,
+        cuántos canales hay y dónde ver la transmisión. Eso hace que <strong>Pirlo TV hoy</strong> no sea solo una keyword,
+        sino una puerta de entrada a páginas más precisas para equipos, ligas y partidos puntuales.
       </p>
 
       <p>
-        No necesitas descargar ninguna aplicación ni registrarte para ver los partidos.
-        <strong>Pirlo TV en vivo</strong> funciona directamente en tu navegador, ya sea desde
-        tu computadora, tablet o celular. La <strong>roja directa</strong> del fútbol mundial
-        está al alcance de tu mano. Disfruta de <strong>livetv</strong> deportivo con la mejor
-        calidad y sin interrupciones en <strong>rojadirectaenvivo.top</strong>.
+        Si lo que quieres es una alternativa estable a <strong>PirloTV</strong>, <strong>Fútbol Libre</strong>,
+        <strong> Tarjeta Roja</strong> o <strong>Rojadirecta</strong>, aquí tienes una estructura más limpia para seguir el fútbol
+        latinoamericano y europeo desde celular, tablet o computadora, sin registro y con copy pensado para resolver la búsqueda rápido.
       </p>
     </div>
 
-    <RelatedMatches matches={events} title="Partidos de Hoy" />
+    <InternalLinks links={hubLinks} title="Ligas destacadas para Pirlo TV" />
+
+    <RelatedMatches matches={events} title="Pirlo TV Hoy — Partidos en Vivo" />
 
     <FAQ items={faqs} />
 
-    <InternalLinks links={internalLinks} />
+    <InternalLinks links={internalLinks} title="Más páginas relacionadas" />
 
     <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
       <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">

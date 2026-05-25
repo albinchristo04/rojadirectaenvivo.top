@@ -10,4 +10,5 @@ User-agent: msnbot
 Allow: /
 Crawl-delay: 1
 
+Host: https://rojadirectaenvivo.top
 Sitemap: https://rojadirectaenvivo.top/sitemap-index.xml

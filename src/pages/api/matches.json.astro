@@ -6,13 +6,16 @@ const events = matchDataRaw.events || [];
 const apiResponse = {
   status: 'ok',
   website: 'https://rojadirectaenvivo.top',
+  sourceUrl: matchDataRaw.sourceUrl || '',
   lastUpdated: matchDataRaw.lastUpdated || new Date().toISOString(),
   totalMatches: events.length,
   embedBaseUrl: 'https://rojadirectaenvivo.top/embed/',
   matches: events.map((event: any) => ({
     id: event.id,
     league: event.league,
+    title: event.title || event.teams,
     teams: event.teams,
+    sourceDay: event.sourceDay || '',
     date: event.date,
     time: event.time,
     embedUrl: `https://rojadirectaenvivo.top/embed/${event.id}/`,

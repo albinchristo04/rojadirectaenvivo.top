@@ -2,75 +2,43 @@
 import Base from '../../layouts/Base.astro';
 import MatchCard from '../../components/MatchCard.astro';
 import matchDataRaw from '../../data/matches.json';
+import { detectSportEs, leagueFlags, leagueSlug, toSlug } from '../../utils/seo';
+import { FEATURED_LEAGUE_ORDER, sortLeagueNames, sortMatchesChronologically } from '../../utils/matches';
 
 const allEvents = matchDataRaw.events || [];
-
-function toSlug(event: any) {
-  const desc = `${event.league} ${event.teams}`
-    .toLowerCase().trim().replace(/\s+/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-  return `${event.id}-${desc}`;
-}
-
-function leagueSlug(league: string) {
-  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
+const allLeagueNames = sortLeagueNames([
+  ...FEATURED_LEAGUE_ORDER,
+  ...allEvents.map((event: any) => event.league).filter(Boolean),
+]);
 
 export function getStaticPaths() {
   const events = matchDataRaw.events || [];
-  const leagues: Record<string, any[]> = {};
-  for (const event of events) {
-    const key = event.league || 'Otros';
-    if (!leagues[key]) leagues[key] = [];
-    leagues[key].push(event);
-  }
-  return Object.entries(leagues).map(([leagueName, matches]) => ({
-    params: { slug: leagueName.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') },
-    props: { leagueName, matches },
+  const leagueNames = sortLeagueNames([
+    ...FEATURED_LEAGUE_ORDER,
+    ...events.map((event: any) => event.league).filter(Boolean),
+  ]);
+  return leagueNames.map((leagueName) => ({
+    params: { slug: leagueSlug(leagueName) },
+    props: {
+      leagueName,
+      matches: sortMatchesChronologically(events.filter((event: any) => event.league === leagueName)),
+    },
   }));
 }
 
 const { leagueName, matches } = Astro.props;
 const slug = leagueSlug(leagueName);
-
-// Sort by time
-matches.sort((a: any, b: any) => (a.time || '').localeCompare(b.time || ''));
-
-// League emoji mapping
-const leagueFlags: Record<string, string> = {
-  'Laliga': '🇪🇸', 'Laliga 2': '🇪🇸', 'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  'Serie A': '🇮🇹', 'Bundesliga': '🇩🇪', 'Bundesliga 2': '🇩🇪',
-  'Ligue 1': '🇫🇷', 'Ligue 2': '🇫🇷', 'Eredivisie': '🇳🇱',
-  'Liga Mx': '🇲🇽', 'Liga Endesa': '🇪🇸', 'Torneo LPF': '🇦🇷',
-  'Copa Libertadores': '🌎', 'Champions League': '🇪🇺',
-  'Liga AUF Uruguaya': '🇺🇾', 'Liga Betplay Dimayor': '🇨🇴',
-  'Ecuador Ligapro': '🇪🇨', 'Premiership': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  'NBA': '🇺🇸', 'NHL': '🇺🇸', 'NFL': '🇺🇸', 'MLB': '🇺🇸',
-};
+const orderedMatches = sortMatchesChronologically(matches);
 const emoji = leagueFlags[leagueName] || '⚽';
+const otherLeagues = allLeagueNames.filter((league) => league !== leagueName).slice(0, 8);
+const isLatamHub = /Liga MX|Argentina|Brasileirao|Betplay|LigaPro|Chile|Uruguay|Libertadores|Sudamericana|MLS/i.test(leagueName);
+const sportName = detectSportEs(leagueName);
 
-// Get other leagues for internal linking
-const otherLeagues = [...new Set(allEvents.map((e: any) => e.league))]
-  .filter(l => l !== leagueName)
-  .slice(0, 8);
-
-// SEO
-const title = `${leagueName} en Vivo 🔴 Ver Partidos Gratis | Rojadirecta`;
-const description = `Ver todos los partidos de ${leagueName} en vivo gratis. Transmisión en directo por Rojadirecta en Vivo, Tarjeta Roja, Pirlo TV. ${matches.length} partidos disponibles hoy.`;
+const title = `${leagueName} en Vivo 🔴 Fútbol Libre y Pirlo TV | Rojadirecta`;
+const description = orderedMatches.length > 0
+  ? `Ver ${orderedMatches.length} partidos de ${leagueName} en vivo hoy. Horarios, canales y enlaces actualizados en Rojadirecta en Vivo, Pirlo TV y Fútbol Libre.`
+  : `Hub de ${leagueName} en vivo con horarios, canales y próximas transmisiones. Página en español enfocada en Bing para búsquedas como Pirlo TV, Fútbol Libre y Roja Directa.`;
 const canonicalUrl = `https://rojadirectaenvivo.top/liga/${slug}/`;
-
-// Detect sport for league description text
-function detectSportName(league: string): string {
-  if (/nba|basketball|baloncesto|liga endesa/i.test(league)) return 'baloncesto';
-  if (/nhl|hockey/i.test(league)) return 'hockey sobre hielo';
-  if (/nfl|football americano/i.test(league)) return 'football americano';
-  if (/mlb|baseball|béisbol/i.test(league)) return 'béisbol';
-  if (/ufc|mma|boxeo|boxing/i.test(league)) return 'deportes de combate';
-  if (/f1|formula|motogp|nascar/i.test(league)) return 'motorsport';
-  if (/atp|wta|tennis|tenis/i.test(league)) return 'tenis';
-  return 'fútbol';
-}
-const sportName = detectSportName(leagueName);
 
 const leagueSchema = {
   "@context": "https://schema.org",
@@ -80,12 +48,12 @@ const leagueSchema = {
   "url": canonicalUrl,
   "mainEntity": {
     "@type": "ItemList",
-    "numberOfItems": matches.length,
-    "itemListElement": matches.map((m: any, i: number) => ({
+    "numberOfItems": orderedMatches.length,
+    "itemListElement": orderedMatches.map((match: any, index: number) => ({
       "@type": "ListItem",
-      "position": i + 1,
-      "url": `https://rojadirectaenvivo.top/partido/${toSlug(m)}/`,
-      "name": m.teams
+      "position": index + 1,
+      "url": `https://rojadirectaenvivo.top/partido/${toSlug(match)}/`,
+      "name": match.teams
     }))
   }
 };
@@ -98,12 +66,47 @@ const breadcrumbSchema = {
     { "@type": "ListItem", "position": 2, "name": leagueName, "item": canonicalUrl }
   ]
 };
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `¿Dónde ver ${leagueName} en vivo?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `En esta página reunimos horarios, canales y enlaces de ${leagueName} en vivo. El hub está optimizado para búsquedas en Bing como Pirlo TV, Fútbol Libre y Roja Directa.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `¿Cuántos partidos hay hoy de ${leagueName}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Actualmente hay ${orderedMatches.length} partidos visibles en el hub de ${leagueName}. El número cambia cuando llega nueva programación al feed.`
+      }
+    }
+  ]
+};
+
+const speakableSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "url": canonicalUrl,
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [".keyword-h1", ".keyword-sub", ".seo-text", ".hub-resumen"]
+  }
+};
 ---
 
 <Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={leagueSchema}>
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
+
   <div class="container" style="padding-top: 32px;">
-    <!-- Breadcrumb -->
     <nav class="match-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Inicio</a>
       <span>›</span>
@@ -114,17 +117,23 @@ const breadcrumbSchema = {
       {emoji} {leagueName} en Vivo
     </h1>
     <p class="keyword-sub" style="margin-bottom: 32px;">
-      {matches.length} partidos de {leagueName} disponibles — ver en vivo gratis
+      {orderedMatches.length > 0 ? `${orderedMatches.length} partidos de ${leagueName} disponibles — ver en vivo gratis` : `Hub de ${leagueName} preparado para próximos partidos y búsquedas en Bing`}
     </p>
 
-    <!-- Matches Grid -->
-    <div class="match-grid">
-      {matches.map((event: any) => {
-        const matchSlug = toSlug(event);
-        return (
+    <section class="seo-text hub-resumen" style="margin-top: 0; margin-bottom: 24px;">
+      <p>
+        {isLatamHub
+          ? `Este hub concentra horarios, canales y enlaces de ${leagueName} para usuarios que buscan fútbol latinoamericano en español.`
+          : `Este hub concentra horarios, canales y enlaces de ${leagueName} con texto claro y estructura preparada para Bing y citas de IA.`}
+      </p>
+    </section>
+
+    {orderedMatches.length > 0 ? (
+      <div class="match-grid">
+        {orderedMatches.map((event: any) => (
           <MatchCard
             id={event.id}
-            slug={matchSlug}
+            slug={toSlug(event)}
             title={`${event.league}: ${event.teams}`}
             league={event.league}
             teams={event.teams}
@@ -132,28 +141,51 @@ const breadcrumbSchema = {
             date={event.date}
             channels={event.channels}
           />
-        );
-      })}
-    </div>
+        ))}
+      </div>
+    ) : (
+      <div style="text-align: center; padding: 32px 0 16px;">
+        <p style="color: var(--c-text-secondary); font-size: 16px;">No hay partidos publicados ahora mismo para {leagueName}.</p>
+        <p style="color: var(--c-text-muted); font-size: 13px; margin-top: 8px;">El hub seguirá activo y se llenará automáticamente cuando aparezcan nuevos encuentros.</p>
+      </div>
+    )}
 
-    <!-- SEO Text -->
     <section class="seo-text">
       <h2>Ver {leagueName} en Vivo Gratis</h2>
       <p>
         Bienvenido a la página de <strong>{leagueName}</strong> en <strong>Rojadirecta en Vivo</strong>.
-        Aquí encontrarás todos los partidos de {sportName} de <strong>{leagueName}</strong> transmitidos
-        en vivo y en directo. Similar a <strong>Tarjeta Roja</strong> y <strong>Pirlo TV</strong>,
-        ofrecemos la mejor experiencia para ver {sportName} en vivo gratis.
+        Aquí encontrarás los partidos de {sportName} de <strong>{leagueName}</strong> con horarios,
+        canales y enlaces actualizados. Similar a <strong>Tarjeta Roja</strong>, <strong>Pirlo TV</strong>
+        y <strong>Fútbol Libre</strong>, ofrecemos una página clara para ver {sportName} en vivo gratis.
       </p>
       <p>
-        Todos los partidos se actualizan automáticamente cada 3 horas. Vuelve a esta página
-        regularmente para ver los próximos partidos de <strong>{leagueName}</strong>.
-        En <strong>rojadirectaenvivo.top</strong> encontrarás las mejores transmisiones de
-        {sportName} en vivo — sin registro, sin pago, completamente gratis.
+        Todos los partidos se actualizan automáticamente con cada nueva importación del feed.
+        Vuelve a esta página regularmente para ver los próximos partidos de <strong>{leagueName}</strong>.
+        En <strong>rojadirectaenvivo.top</strong> encontrarás transmisiones de {sportName} en vivo,
+        con copy en español y estructura lista para Bing Copilot y otras herramientas de cita.
       </p>
     </section>
 
-    <!-- Other Leagues -->
+    <section class="seo-text faq-section" style="margin-top: 24px;">
+      <h3>Preguntas Frecuentes</h3>
+      <details style="margin-bottom: 12px;" open>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿Dónde ver {leagueName} en vivo gratis?
+        </summary>
+        <p style="margin-top: 8px;">
+          En esta página mostramos horarios, canales y partidos disponibles de {leagueName}. El objetivo es responder rápido a búsquedas como Pirlo TV, Fútbol Libre y Roja Directa.
+        </p>
+      </details>
+      <details>
+        <summary style="cursor: pointer; font-weight: 600; color: var(--c-text-primary);">
+          ¿Cuántos partidos hay ahora mismo?
+        </summary>
+        <p style="margin-top: 8px;">
+          El hub de {leagueName} tiene {orderedMatches.length} partidos visibles en este momento. Cuando el feed cambia, este número también cambia.
+        </p>
+      </details>
+    </section>
+
     {otherLeagues.length > 0 && (
       <section class="seo-text" style="margin-top: 24px;">
         <h3>Otras Ligas en Vivo</h3>
@@ -167,7 +199,6 @@ const breadcrumbSchema = {
       </section>
     )}
 
-    <!-- Back to Home -->
     <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
       <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
         ← Ver todos los partidos de hoy

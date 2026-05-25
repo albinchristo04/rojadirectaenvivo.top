@@ -9,24 +9,35 @@ export interface MatchEvent {
   time: string;
   date: string;
   datetime?: string;
+  title?: string;
+  sourceDay?: string;
   channels: { id: string; channelId: string; providerId: number; lang: string; name: string; url: string }[];
 }
 
 // ── Slug Generators ──────────────────────────────────────────
 
+export function slugify(value: string): string {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 export function toSlug(event: MatchEvent): string {
-  const desc = `${event.league} ${event.teams}`
-    .toLowerCase().trim().replace(/\s+/g, ' ')
-    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-  return `${event.id}-${desc}`;
+  return `${event.id}-${slugify(`${event.league} ${event.teams}`)}`;
 }
 
 export function leagueSlug(league: string): string {
-  return league.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  return slugify(league);
 }
 
 export function teamSlug(name: string): string {
-  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  return slugify(name);
 }
 
 // ── Sport Detection ──────────────────────────────────────────
@@ -50,11 +61,34 @@ export function detectSportEs(league: string): string {
 // ── League Flags ─────────────────────────────────────────────
 
 export const leagueFlags: Record<string, string> = {
-  'Laliga': '🇪🇸', 'Laliga 2': '🇪🇸', 'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  'Serie A': '🇮🇹', 'Bundesliga': '🇩🇪', 'Ligue 1': '🇫🇷',
-  'Liga Mx': '🇲🇽', 'Torneo LPF': '🇦🇷', 'Copa Libertadores': '🌎',
-  'Champions League': '🇪🇺', 'Liga Betplay Dimayor': '🇨🇴',
-  'Ecuador Ligapro': '🇪🇨', 'NBA': '🏀', 'NHL': '🏒', 'NFL': '🏈', 'MLB': '⚾',
+  'LaLiga': '🇪🇸',
+  'Laliga': '🇪🇸',
+  'Laliga 2': '🇪🇸',
+  'Premier League': '🏴',
+  'Serie A': '🇮🇹',
+  'Bundesliga': '🇩🇪',
+  'Ligue 1': '🇫🇷',
+  'Liga MX': '🇲🇽',
+  'Liga Mx': '🇲🇽',
+  'Liga Profesional Argentina': '🇦🇷',
+  'Torneo LPF': '🇦🇷',
+  'Brasileirao': '🇧🇷',
+  'Liga Betplay Dimayor': '🇨🇴',
+  'LigaPro Ecuador': '🇪🇨',
+  'Ecuador Ligapro': '🇪🇨',
+  'Primera Division Chile': '🇨🇱',
+  'Liga AUF Uruguay': '🇺🇾',
+  'Liga AUF Uruguaya': '🇺🇾',
+  'MLS': '🇺🇸',
+  'Copa Libertadores': '🌎',
+  'Copa Sudamericana': '🌎',
+  'Champions League': '🇪🇺',
+  'Selecciones Juveniles': '🧒',
+  'Futbol Internacional': '🌍',
+  'NBA': '🏀',
+  'NHL': '🏒',
+  'NFL': '🏈',
+  'MLB': '⚾',
 };
 
 // ── ISO Date Helper ──────────────────────────────────────────
@@ -68,8 +102,16 @@ export function toISODate(dateStr: string): string {
 
 const SITE = 'https://rojadirectaenvivo.top';
 
+function extractTeamNames(teams: string): string[] {
+  const normalized = String(teams || '')
+    .replace(/\s+(?:x|@)\s+/ig, ' vs ')
+    .replace(/\s+-\s+/g, ' vs ');
+  const parts = normalized.split(/\s+vs\.?\s+/i).map(part => part.trim()).filter(Boolean);
+  return parts.length >= 2 ? parts : [teams || 'Equipo A', 'Equipo B'];
+}
+
 export function buildSportsEventSchema(event: MatchEvent) {
-  const teamNames = (event.teams || '').split(/\s*-\s*/);
+  const teamNames = extractTeamNames(event.teams);
   const teamA = teamNames[0]?.trim() || 'Equipo A';
   const teamB = teamNames[1]?.trim() || 'Equipo B';
   const isoDate = toISODate(event.date);
@@ -92,7 +134,7 @@ export function buildSportsEventSchema(event: MatchEvent) {
       "url": `${SITE}/equipo/${teamSlug(teamB)}/`,
     },
     "location": { "@type": "Place", "name": "Transmisión en Vivo" },
-    "organizer": { "@type": "Organization", "name": event.league },
+    "organizer": { "@type": "Organization", "name": event.league || 'Rojadirecta en Vivo' },
     "url": `${SITE}/partido/${toSlug(event)}/`,
   };
 }

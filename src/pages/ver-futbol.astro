@@ -5,11 +5,12 @@ import FAQ from '../components/FAQ.astro';
 import RelatedMatches from '../components/RelatedMatches.astro';
 import InternalLinks from '../components/InternalLinks.astro';
 import { getMatches } from '../utils/matches';
+import { buildBreadcrumbSchema } from '../utils/seo';
 
 const events = getMatches();
 
-const title = 'Ver Fútbol Online Gratis – Partidos en Vivo Hoy | Rojadirecta';
-const description = 'Ver fútbol online gratis hoy. Todos los partidos en vivo sin registro. Rojadirecta, Tarjeta Roja, Pirlo TV y Fútbol Libre en un solo lugar.';
+const title = 'Ver Fútbol Online Hoy | Liga MX, Argentina y Libertadores';
+const description = 'Ver fútbol online hoy con partidos de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas. Página en español para búsquedas tipo Rojadirecta, Pirlo TV y Fútbol Libre.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/ver-futbol/';
 
 const breadcrumbs = [
@@ -17,10 +18,38 @@ const breadcrumbs = [
   { name: 'Ver Fútbol Online', url: canonicalUrl },
 ];
 
+const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbs);
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Ver Fútbol Online Gratis',
+  description,
+  url: canonicalUrl,
+  inLanguage: 'es',
+  about: [
+    { '@type': 'Thing', name: 'Ver fútbol online' },
+    { '@type': 'Thing', name: 'Liga MX' },
+    { '@type': 'Thing', name: 'Liga Profesional Argentina' },
+    { '@type': 'Thing', name: 'Brasileirao' },
+    { '@type': 'Thing', name: 'Copa Libertadores' },
+  ],
+};
+
+const speakableSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: canonicalUrl,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.keyword-h1', '.keyword-sub', '.bing-resumen', '.keyword-text'],
+  },
+};
+
 const faqs = [
   {
     question: '¿Cómo ver fútbol gratis en internet?',
-    answer: 'Visita rojadirectaenvivo.top para ver fútbol gratis en internet. Ofrecemos transmisiones en vivo de todas las ligas del mundo sin necesidad de registro ni suscripción.',
+    answer: 'Visita rojadirectaenvivo.top para ver fútbol gratis en internet. Priorizamos partidos de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas, con páginas claras para cada partido.',
   },
   {
     question: '¿Qué necesito para ver fútbol online?',
@@ -28,8 +57,23 @@ const faqs = [
   },
   {
     question: '¿Se puede ver fútbol online desde España/Argentina/México?',
-    answer: 'Sí, rojadirectaenvivo.top funciona en todo el mundo. No importa desde qué país accedas, podrás ver todos los partidos disponibles sin restricciones geográficas.',
+    answer: 'Sí. La web funciona desde distintos países y está escrita en español para responder especialmente a búsquedas de Latinoamérica y del mercado hispano.',
   },
+  {
+    question: '¿Qué ligas aparecen primero?',
+    answer: `Hoy mostramos ${events.length} partidos y damos prioridad editorial a Liga MX, fútbol argentino, Brasileirão, Liga BetPlay, LigaPro Ecuador, Chile, MLS y Copa Libertadores.`,
+  },
+];
+
+const hubLinks = [
+  { label: '🇲🇽 Liga MX', href: '/liga/liga-mx/' },
+  { label: '🇦🇷 Liga Argentina', href: '/liga/liga-profesional-argentina/' },
+  { label: '🇧🇷 Brasileirão', href: '/liga/brasileirao/' },
+  { label: '🇨🇴 Liga BetPlay', href: '/liga/liga-betplay-dimayor/' },
+  { label: '🇪🇨 LigaPro Ecuador', href: '/liga/ligapro-ecuador/' },
+  { label: '🇺🇸 MLS', href: '/liga/mls/' },
+  { label: '🌎 Copa Libertadores', href: '/liga/copa-libertadores/' },
+  { label: '📅 Partidos de Hoy', href: '/hoy/' },
 ];
 
 const internalLinks = [
@@ -43,41 +87,53 @@ const internalLinks = [
 ];
 ---
 
-<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={pageSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
   <div class="container" style="padding-top: 32px;">
     <Breadcrumb items={breadcrumbs} />
 
     <section class="keyword-hero">
       <h1 class="keyword-h1">Ver Fútbol Online Gratis</h1>
-      <p class="keyword-sub">Partidos en vivo gratis — fútbol en directo sin descargas</p>
+      <p class="keyword-sub">Ver fútbol online hoy con foco en México, Argentina, Brasil y Libertadores</p>
+    </section>
+
+    <section class="seo-text bing-resumen" style="margin-top: 0; margin-bottom: 24px;">
+      <h2>Resumen rápido</h2>
+      <p>
+        Esta página responde a búsquedas como <strong>ver fútbol online hoy</strong> y <strong>ver fútbol gratis en internet</strong>
+        con partidos del día, enlaces internos por liga y una prioridad clara para el fútbol latinoamericano.
+      </p>
     </section>
 
     <div class="keyword-text">
       <p>
         <strong>Ver fútbol online gratis</strong> nunca fue tan sencillo. En <strong>rojadirectaenvivo.top</strong>
-        reunimos todas las transmisiones disponibles para que puedas disfrutar de los partidos del día desde
-        cualquier dispositivo. Sin descargas, sin registro, solo fútbol puro.
+        reunimos las transmisiones disponibles para que puedas disfrutar de los partidos del día desde
+        cualquier dispositivo. Sin descargas, sin registro y con una estructura clara para encontrar rápido lo que buscas.
       </p>
 
       <p>
-        Si buscas una forma confiable de <strong>ver fútbol gratis</strong>, estás en el lugar correcto.
-        Nuestra plataforma es la evolución de sitios como <strong>Rojadirecta</strong>, <strong>Tarjeta Roja</strong>,
-        <strong>Pirlo TV</strong> y <strong>Fútbol Libre</strong>. Combinamos lo mejor de todos en una
-        interfaz moderna y rápida.
+        Si buscas una forma confiable de <strong>ver fútbol gratis</strong>, aquí no solo encuentras una portada genérica.
+        Enlazamos cada jornada con hubs de <strong>Liga MX</strong>, <strong>fútbol argentino</strong>,
+        <strong> Brasileirão</strong>, <strong>Liga BetPlay Colombia</strong>, <strong>LigaPro Ecuador</strong>,
+        <strong> Chile</strong>, <strong>MLS</strong> y <strong>Copa Libertadores</strong>.
       </p>
 
       <p>
-        Cada partido tiene múltiples canales de transmisión para que siempre encuentres una opción que funcione.
-        Cubrimos LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Liga MX, Liga Profesional Argentina,
-        Copa Libertadores, Champions League, NBA y muchas más.
+        Cada partido tiene su propia página y cuando el feed ofrece varios canales, puedes elegir entre más de una opción.
+        Eso permite responder mejor a preguntas reales como <strong>dónde ver</strong>, <strong>a qué hora juega</strong>
+        y <strong>en qué canal pasan</strong> un encuentro específico.
       </p>
 
       <p>
         <strong>Ver fútbol online</strong> en rojadirectaenvivo.top es compatible con celulares, tablets
-        y computadoras. No importa si estás en casa o en movimiento, siempre tendrás acceso a los
-        mejores partidos de <strong>fútbol en vivo gratis</strong>.
+        y computadoras. No importa si estás en casa o en movimiento: la idea es que Bing y el usuario encuentren
+        una respuesta útil, corta y actualizada para el partido o la liga que necesitan.
       </p>
     </div>
+
+    <InternalLinks links={hubLinks} title="Ligas destacadas para ver fútbol online" />
 
     <RelatedMatches matches={events} title="Ver Fútbol Online — Partidos de Hoy" />
 

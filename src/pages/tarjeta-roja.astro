@@ -5,11 +5,12 @@ import FAQ from '../components/FAQ.astro';
 import RelatedMatches from '../components/RelatedMatches.astro';
 import InternalLinks from '../components/InternalLinks.astro';
 import { getMatches } from '../utils/matches';
+import { buildBreadcrumbSchema } from '../utils/seo';
 
 const events = getMatches();
 
-const title = 'Tarjeta Roja TV – Fútbol en Vivo | Rojadirecta Pirlo TV';
-const description = 'Tarjeta Roja TV para ver fútbol en vivo gratis. Todos los partidos del día en directo - Rojadirecta, Pirlo TV, roja directa.';
+const title = 'Tarjeta Roja Hoy | Liga MX, Libertadores y Roja Directa';
+const description = 'Tarjeta Roja hoy para ver fútbol en vivo gratis de Liga MX, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas. Alternativa en español a Rojadirecta y Pirlo TV.';
 const canonicalUrl = 'https://rojadirectaenvivo.top/tarjeta-roja/';
 
 const breadcrumbs = [
@@ -17,19 +18,62 @@ const breadcrumbs = [
   { name: 'Tarjeta Roja', url: canonicalUrl },
 ];
 
+const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbs);
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Tarjeta Roja',
+  description,
+  url: canonicalUrl,
+  inLanguage: 'es',
+  about: [
+    { '@type': 'Thing', name: 'Tarjeta Roja' },
+    { '@type': 'Thing', name: 'Tarjeta Roja TV' },
+    { '@type': 'Thing', name: 'Liga MX' },
+    { '@type': 'Thing', name: 'Brasileirao' },
+    { '@type': 'Thing', name: 'Copa Libertadores' },
+  ],
+};
+
+const speakableSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: canonicalUrl,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.keyword-h1', '.keyword-sub', '.bing-resumen', '.keyword-text'],
+  },
+};
+
 const faqs = [
   {
-    question: '¿Qué es Tarjeta Roja TV?',
-    answer: 'Tarjeta Roja TV es una de las plataformas más conocidas para ver fútbol en vivo. En rojadirectaenvivo.top ofrecemos la misma experiencia con una interfaz actualizada y múltiples canales por partido.',
+    question: '¿Dónde ver Tarjeta Roja hoy?',
+    answer: 'En rojadirectaenvivo.top puedes ver Tarjeta Roja hoy con una cartelera en español, enlaces por partido y prioridad para ligas latinoamericanas y copas continentales.',
+  },
+  {
+    question: '¿Tarjeta Roja sirve para ver Liga MX y Libertadores?',
+    answer: 'Sí. La landing está optimizada para usuarios que buscan Tarjeta Roja Liga MX, Tarjeta Roja Libertadores y Tarjeta Roja hoy, con accesos directos a los hubs más fuertes.',
   },
   {
     question: '¿Tarjeta Roja TV es gratis?',
-    answer: 'Sí, ver partidos en Tarjeta Roja de rojadirectaenvivo.top es completamente gratis. No necesitas registrarte ni pagar ninguna suscripción.',
+    answer: 'Sí. El sitio no requiere registro ni suscripción para navegar por la agenda y abrir los partidos disponibles.',
   },
   {
     question: '¿Cuál es la diferencia entre Tarjeta Roja y Rojadirecta?',
-    answer: 'Ambos son sitios populares para ver fútbol en vivo. En rojadirectaenvivo.top combinamos lo mejor de ambos con transmisiones actualizadas y una interfaz moderna.',
+    answer: 'Las dos marcas comparten intención de búsqueda. Aquí consolidamos ambas junto con Pirlo TV y Fútbol Libre, pero con rutas internas más claras para partidos, ligas y equipos.',
   },
+];
+
+const hubLinks = [
+  { label: '🇲🇽 Liga MX', href: '/liga/liga-mx/' },
+  { label: '🇦🇷 Liga Argentina', href: '/liga/liga-profesional-argentina/' },
+  { label: '🇧🇷 Brasileirão', href: '/liga/brasileirao/' },
+  { label: '🇨🇴 Liga BetPlay', href: '/liga/liga-betplay-dimayor/' },
+  { label: '🇪🇨 LigaPro Ecuador', href: '/liga/ligapro-ecuador/' },
+  { label: '🇺🇸 MLS', href: '/liga/mls/' },
+  { label: '🌎 Copa Libertadores', href: '/liga/copa-libertadores/' },
+  { label: '📅 Partidos de Hoy', href: '/hoy/' },
 ];
 
 const internalLinks = [
@@ -37,56 +81,65 @@ const internalLinks = [
   { label: '⚽ Fútbol en Vivo', href: '/futbol-en-vivo/' },
   { label: '🔴 Rojadirecta en Vivo', href: '/rojadirecta-en-vivo/' },
   { label: '📺 Pirlo TV', href: '/pirlo-tv/' },
-  { label: '📅 Partidos de Hoy', href: '/partidos-de-hoy/' },
   { label: '🆓 Fútbol en Vivo Gratis', href: '/futbol-en-vivo-gratis/' },
   { label: '👀 Ver Fútbol Online', href: '/ver-futbol/' },
 ];
 ---
 
-<Base title={title} description={description} canonicalUrl={canonicalUrl}>
+<Base title={title} description={description} canonicalUrl={canonicalUrl} matchSchema={pageSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} slot="head" />
+
   <div class="container" style="padding-top: 32px;">
     <Breadcrumb items={breadcrumbs} />
 
     <section class="keyword-hero">
       <h1 class="keyword-h1">Tarjeta Roja</h1>
-      <p class="keyword-sub">Ver partidos en vivo gratis — fútbol en directo sin interrupciones</p>
+      <p class="keyword-sub">Tarjeta Roja hoy con prioridad para Liga MX, Libertadores y fútbol en español</p>
+    </section>
+
+    <section class="seo-text bing-resumen" style="margin-top: 0; margin-bottom: 24px;">
+      <h2>Resumen rápido</h2>
+      <p>
+        Esta página responde a búsquedas como <strong>tarjeta roja hoy</strong> y <strong>tarjeta roja en vivo</strong>
+        con una agenda orientada a México, Argentina, Brasil, Colombia, Ecuador, Chile, MLS y copas.
+      </p>
     </section>
 
     <div class="keyword-text">
       <p>
-        <strong>Tarjeta Roja</strong> es uno de los nombres más conocidos en el mundo del streaming de fútbol en vivo.
-        En <strong>rojadirectaenvivo.top</strong> te ofrecemos la misma experiencia que <strong>Tarjeta Roja TV</strong>
-        con una interfaz moderna y actualizada. Aquí puedes ver todos los partidos del día sin registro y completamente gratis.
+        <strong>Tarjeta Roja</strong> sigue siendo una keyword fuerte para usuarios que quieren abrir un partido rápido.
+        En <strong>rojadirectaenvivo.top</strong> esa intención se transforma en una landing clara, con foco en
+        <strong> fútbol en vivo gratis</strong> y con mejor distribución hacia páginas internas por torneo y encuentro.
       </p>
 
       <p>
-        Si buscas <strong>tarjeta roja en vivo</strong>, has llegado al lugar correcto. Nuestra plataforma reúne
-        múltiples fuentes de transmisión para que puedas disfrutar del fútbol en directo sin interrupciones.
-        Ya sea LaLiga, Premier League, Champions League, Copa Libertadores o cualquier otra competición,
-        la <strong>tarjeta roja directa</strong> está aquí para ti.
+        Muchas búsquedas de <strong>Tarjeta Roja TV</strong> vienen desde Latinoamérica. Por eso reforzamos el contenido alrededor de
+        <strong> Liga MX</strong>, <strong>fútbol argentino</strong>, <strong>Brasileirão</strong>,
+        <strong> Liga BetPlay Colombia</strong>, <strong>LigaPro Ecuador</strong>, <strong>Chile</strong>,
+        <strong> Uruguay</strong>, <strong>MLS</strong> y <strong>Copa Libertadores</strong>.
       </p>
 
       <p>
-        A diferencia de otros sitios, en <strong>Tarjeta Roja</strong> de rojadirectaenvivo.top ofrecemos
-        varias opciones de canales por partido. Si un canal no funciona, simplemente cambia al siguiente.
-        Nuestro contenido se actualiza automáticamente cada 3 horas con los últimos partidos disponibles.
-        <strong>Rojadirecta</strong> y <strong>Pirlo TV</strong> son algunas de las alternativas que también
-        encontrarás en nuestra plataforma.
+        Esta página no intenta competir solo con una keyword corta. También busca responder consultas derivadas como
+        <strong> tarjeta roja liga mx</strong>, <strong>tarjeta roja hoy libertadores</strong> o <strong>tarjeta roja roja directa</strong>,
+        enlazando hacia hubs y partidos donde la respuesta es más específica.
       </p>
 
       <p>
-        Ver <strong>fútbol en vivo gratis</strong> nunca fue tan sencillo. Con <strong>Tarjeta Roja TV</strong>
-        en rojadirectaenvivo.top tienes acceso a partidos de todo el mundo, desde ligas sudamericanas
-        hasta las mejores competiciones europeas. Todo el <strong>futbol en vivo</strong> en un solo lugar,
-        sin pagar, sin registrarse, solo <strong>roja directa</strong> pura.
+        Si alguien entra buscando una alternativa a <strong>Rojadirecta</strong>, <strong>Pirlo TV</strong> o <strong>Fútbol Libre</strong>,
+        debe encontrar en segundos lo esencial: qué se juega hoy, en qué liga, a qué hora y dónde hacer clic.
+        Esa es la lógica de esta landing y de toda la arquitectura interna que la rodea.
       </p>
     </div>
 
-    <RelatedMatches matches={events} title="Partidos de Hoy" />
+    <InternalLinks links={hubLinks} title="Ligas destacadas en Tarjeta Roja" />
+
+    <RelatedMatches matches={events} title="Tarjeta Roja Hoy — Partidos en Vivo" />
 
     <FAQ items={faqs} />
 
-    <InternalLinks links={internalLinks} />
+    <InternalLinks links={internalLinks} title="Más páginas relacionadas" />
 
     <div style="text-align: center; margin-top: 32px; margin-bottom: 32px;">
       <a href="/" style="color: var(--c-accent); text-decoration: none; font-weight: 600;">
